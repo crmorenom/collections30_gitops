@@ -1,0 +1,76 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.microservices.msentitytransactions.name }}
+  namespace: {{ .Values.namespace }}
+  annotations:
+    reloader.stakater.com/auto: "true"
+spec:
+  selector:
+    matchLabels:
+      run: {{ .Values.microservices.msentitytransactions.name }}
+  replicas: {{ .Values.microservices.msentitytransactions.replicaCount }}
+  minReadySeconds: 5
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 1  
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/instance: {{ .Values.microservices.msentitytransactions.name }}
+        project: {{ .Values.project }}
+        run: {{ .Values.microservices.msentitytransactions.name }}
+    spec:
+      containers:
+        - name: {{ .Values.microservices.msentitytransactions.name }}
+          image: {{ .Values.microservices.msentitytransactions.image }}:{{ .Values.microservices.msentitytransactions.version }}
+          imagePullPolicy: {{ .Values.microservices.msentitytransactions.pullPolicy }}
+          env:
+            - name: JHIPSTER_SECURITY_AUTHENTICATION_JWT_BASE64_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: jwt-secret-{{ .Values.microservices.msentitytransactions.name }}
+                  key: secret
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: jwt-secret-{{ .Values.microservices.msentitytransactions.name }}
+                  key: databasePassword
+          envFrom:
+            - configMapRef:
+                name: cm-{{ .Values.microservices.msentitytransactions.name }}
+          ports:
+            - containerPort: {{ .Values.microservices.msentitytransactions.containerPort }}
+              protocol: TCP
+            - containerPort: {{ .Values.microservices.msentitytransactions.configmap.env.APP_HAZELCAST_CONFIG_PORT }}
+              protocol: TCP
+          volumeMounts:
+            - name: tz-config
+              mountPath: /etc/localtime
+          readinessProbe:
+            httpGet:
+              path: /services/{{ .Values.microservices.msentitytransactions.name }}/management/health
+              port: {{ .Values.microservices.msentitytransactions.containerPort }}
+            initialDelaySeconds: {{ .Values.microservices.msentitytransactions.probe.readiness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.microservices.msentitytransactions.probe.readiness.periodSeconds }}
+            failureThreshold: {{ .Values.microservices.msentitytransactions.probe.readiness.failureThreshold }}
+          livenessProbe:
+            httpGet:
+              path: /services/{{ .Values.microservices.msentitytransactions.name }}/management/health
+              port: {{ .Values.microservices.msentitytransactions.containerPort }}
+            initialDelaySeconds: {{ .Values.microservices.msentitytransactions.probe.liveness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.microservices.msentitytransactions.probe.liveness.periodSeconds }}
+            failureThreshold: {{ .Values.microservices.msentitytransactions.probe.liveness.failureThreshold }}
+          lifecycle:
+            preStop:
+              exec:                
+                command: [ "sh", "-c", "sleep 10" ]
+      terminationGracePeriodSeconds: 20                
+      volumes:
+        - name: tz-config
+          hostPath:
+            path: /usr/share/zoneinfo/America/Santiago
+      imagePullSecrets:
+        - name: {{ .Values.ociSecret.name }}

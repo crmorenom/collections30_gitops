@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.microservices.bscs.services.bscs.name }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: {{ .Values.microservices.bscs.services.bscs.name }}
+    app.kubernetes.io/instance: {{ .Values.microservices.bscs.services.bscs.name }}
+    project: {{ .Values.project }}
+    app.kubernetes.io/name: {{ .Values.microservices.bscs.services.bscs.name }}
+spec:
+  type: {{ .Values.microservices.bscs.services.bscs.type }}
+  ports:
+    - port: {{ .Values.microservices.bscs.services.bscs.port }}
+      name: {{ .Values.microservices.bscs.services.bscs.protocol }}
+      targetPort: {{ .Values.microservices.bscs.services.bscs.targetPort }}
+
+  selector:
+    app: dpl-{{ .Values.microservices.bscs.name }}
+    app.kubernetes.io/instance: dpl-{{ .Values.microservices.bscs.name }}

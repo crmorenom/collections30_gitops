@@ -1,0 +1,75 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.microservices.ordercareadaptor.name }}
+  namespace: {{ .Values.namespace }}
+  annotations:
+    reloader.stakater.com/auto: "true"
+spec:
+  selector:
+    matchLabels:
+      run: {{ .Values.microservices.ordercareadaptor.name }}
+  replicas: {{ .Values.microservices.ordercareadaptor.replicaCount }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/instance: {{ .Values.microservices.ordercareadaptor.name }}
+        project: {{ .Values.project }}
+        run: {{ .Values.microservices.ordercareadaptor.name }}
+    spec:
+      containers:
+        - name: {{ .Values.microservices.ordercareadaptor.name }}
+          image: {{ .Values.microservices.ordercareadaptor.image }}:{{ .Values.microservices.ordercareadaptor.version }}
+          imagePullPolicy: {{ .Values.microservices.ordercareadaptor.pullPolicy }}
+          env:
+            - name: JHIPSTER_SECURITY_AUTHENTICATION_JWT_BASE64_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: jwt-secret-{{ .Values.microservices.ordercareadaptor.name }}
+                  key: secret
+            - name: SERVICES_EOC_GETSUSPENSIONTRANSACTION_ACTIONSBASICAUTH_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: jwt-secret-{{ .Values.microservices.ordercareadaptor.name }}
+                  key: eocusername
+            - name: SERVICES_EOC_GETSUSPENSIONTRANSACTION_ACTIONSBASICAUTH_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: jwt-secret-{{ .Values.microservices.ordercareadaptor.name }}
+                  key: eocpassword
+            - name: SERVICES_EOC_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: jwt-secret-{{ .Values.microservices.ordercareadaptor.name }}
+                  key: servicesEocPassword
+          envFrom:
+            - configMapRef:
+                name: cm-{{ .Values.microservices.ordercareadaptor.name }}
+          ports:
+            - containerPort: {{ .Values.microservices.ordercareadaptor.containerPort }}
+              protocol: TCP
+            - containerPort: {{ .Values.microservices.ordercareadaptor.configmap.env.APP_HAZELCAST_CONFIG_PORT }}
+              protocol: TCP
+          volumeMounts:
+            - name: tz-config
+              mountPath: /etc/localtime
+          readinessProbe:
+            httpGet:
+              path: /services/{{ .Values.microservices.ordercareadaptor.name }}/management/health
+              port: {{ .Values.microservices.ordercareadaptor.containerPort }}
+            initialDelaySeconds: {{ .Values.microservices.ordercareadaptor.probe.readiness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.microservices.ordercareadaptor.probe.readiness.periodSeconds }}
+            failureThreshold: {{ .Values.microservices.ordercareadaptor.probe.readiness.failureThreshold }}
+          livenessProbe:
+            httpGet:
+              path: /services/{{ .Values.microservices.ordercareadaptor.name }}/management/health
+              port: {{ .Values.microservices.ordercareadaptor.containerPort }}
+            initialDelaySeconds: {{ .Values.microservices.ordercareadaptor.probe.liveness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.microservices.ordercareadaptor.probe.liveness.periodSeconds }}
+            failureThreshold: {{ .Values.microservices.ordercareadaptor.probe.liveness.failureThreshold }}
+      volumes:
+        - name: tz-config
+          hostPath:
+            path: /usr/share/zoneinfo/America/Santiago
+      imagePullSecrets:
+        - name: {{ .Values.ociSecret.name }}

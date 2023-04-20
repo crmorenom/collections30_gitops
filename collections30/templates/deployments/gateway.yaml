@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.microservices.gateway.name }}
+  namespace: {{ .Values.namespace }}
+  annotations:
+    reloader.stakater.com/auto: "true"
+spec:
+  selector:
+    matchLabels:
+      run: {{ .Values.microservices.gateway.name }}
+  replicas: {{ .Values.microservices.gateway.replicaCount }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/instance: {{ .Values.microservices.gateway.name }}
+        project: {{ .Values.project }}
+        run: {{ .Values.microservices.gateway.name }}
+    spec:
+      containers:
+        - name: {{ .Values.microservices.gateway.name }}
+          image: {{ .Values.microservices.gateway.image }}:{{ .Values.microservices.gateway.version }}
+          imagePullPolicy: {{ .Values.microservices.gateway.pullPolicy }}
+          env:
+            - name: JHIPSTER_SECURITY_AUTHENTICATION_JWT_BASE64_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: jwt-secret-{{ .Values.microservices.gateway.name }}
+                  key: secret
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: jwt-secret-{{ .Values.microservices.gateway.name }}
+                  key: databasePassword
+          envFrom:
+            - configMapRef:
+                name: cm-{{ .Values.microservices.gateway.name }}
+          ports:
+            - containerPort: {{ .Values.microservices.gateway.containerPort }}
+              protocol: TCP
+            - containerPort: {{ .Values.microservices.gateway.configmap.env.APP_HAZELCAST_CONFIG_PORT }}
+              protocol: TCP
+          volumeMounts:
+            - name: tz-config
+              mountPath: /etc/localtime
+          readinessProbe:
+            httpGet:
+              path: /management/health
+              port: {{ .Values.microservices.gateway.containerPort }}
+            initialDelaySeconds: {{ .Values.microservices.gateway.probe.readiness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.microservices.gateway.probe.readiness.periodSeconds }}
+            failureThreshold: {{ .Values.microservices.gateway.probe.readiness.failureThreshold }}
+          livenessProbe:
+            httpGet:
+              path: /management/health
+              port: {{ .Values.microservices.gateway.containerPort }}
+            initialDelaySeconds: {{ .Values.microservices.gateway.probe.liveness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.microservices.gateway.probe.liveness.periodSeconds }}
+            failureThreshold: {{ .Values.microservices.gateway.probe.liveness.failureThreshold }}
+      volumes:
+        - name: tz-config
+          hostPath:
+            path: /usr/share/zoneinfo/America/Santiago
+      imagePullSecrets:
+        - name: {{ .Values.ociSecret.name }}

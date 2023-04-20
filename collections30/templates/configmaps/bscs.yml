@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cm-{{ .Values.microservices.bscs.name }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    app.kubernetes.io/instance: {{ .Values.microservices.bscs.name }}
+    project: {{ .Values.project }}
+data:
+{{- range $key, $value := .Values.microservices.bscs.configmap.env }}
+  {{ $key }}: {{ $value | quote }}
+{{- end }}

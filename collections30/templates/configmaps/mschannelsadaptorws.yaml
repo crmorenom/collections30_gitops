@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cm-{{ .Values.microservices.mschannelsadaptorws.name }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    app.kubernetes.io/instance: {{ .Values.microservices.mschannelsadaptorws.name }}
+    project: {{ .Values.project }}
+data:
+{{- range $key, $value := .Values.microservices.mschannelsadaptorws.configmap.env }}
+  {{ $key }}: {{ $value | quote }}
+{{- end }}

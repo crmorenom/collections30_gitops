@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.microservices.mschannelsadaptor.name }}
+  namespace: {{ .Values.namespace }}
+  annotations:
+    reloader.stakater.com/auto: "true"
+spec:
+  selector:
+    matchLabels:
+      run: {{ .Values.microservices.mschannelsadaptor.name }}
+  replicas: {{ .Values.microservices.mschannelsadaptor.replicaCount }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/instance: {{ .Values.microservices.mschannelsadaptor.name }}
+        project: {{ .Values.project }}
+        run: {{ .Values.microservices.mschannelsadaptor.name }}
+    spec:
+      containers:
+        - name: {{ .Values.microservices.mschannelsadaptor.name }}
+          image: {{ .Values.microservices.mschannelsadaptor.image }}:{{ .Values.microservices.mschannelsadaptor.version }}
+          imagePullPolicy: {{ .Values.microservices.mschannelsadaptor.pullPolicy }}
+          env:
+            - name: JHIPSTER_SECURITY_AUTHENTICATION_JWT_BASE64_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: jwt-secret-{{ .Values.microservices.mschannelsadaptor.name }}
+                  key: secret
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: jwt-secret-{{ .Values.microservices.mschannelsadaptor.name }}
+                  key: databasePassword
+          envFrom:
+            - configMapRef:
+                name: cm-{{ .Values.microservices.mschannelsadaptor.name }}
+          ports:
+            - containerPort: {{ .Values.microservices.mschannelsadaptor.containerPort }}
+              protocol: TCP
+            - containerPort: {{ .Values.microservices.mschannelsadaptor.configmap.env.APP_HAZELCAST_CONFIG_PORT }}
+              protocol: TCP
+          volumeMounts:
+            - name: tz-config
+              mountPath: /etc/localtime
+          readinessProbe:
+            httpGet:
+              path: /services/channelsadaptor/management/health
+              port: {{ .Values.microservices.mschannelsadaptor.containerPort }}
+            initialDelaySeconds: {{ .Values.microservices.mschannelsadaptor.probe.readiness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.microservices.mschannelsadaptor.probe.readiness.periodSeconds }}
+            failureThreshold: {{ .Values.microservices.mschannelsadaptor.probe.readiness.failureThreshold }}
+          livenessProbe:
+            httpGet:
+              path: /services/channelsadaptor/management/health
+              port: {{ .Values.microservices.mschannelsadaptor.containerPort }}
+            initialDelaySeconds: {{ .Values.microservices.mschannelsadaptor.probe.liveness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.microservices.mschannelsadaptor.probe.liveness.periodSeconds }}
+            failureThreshold: {{ .Values.microservices.mschannelsadaptor.probe.liveness.failureThreshold }}
+      volumes:
+        - name: tz-config
+          hostPath:
+            path: /usr/share/zoneinfo/America/Santiago
+      imagePullSecrets:
+        - name: {{ .Values.ociSecret.name }}

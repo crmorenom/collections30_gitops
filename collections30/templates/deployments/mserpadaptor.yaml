@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.microservices.mserpadaptor.name }}
+  namespace: {{ .Values.namespace }}
+  annotations:
+    reloader.stakater.com/auto: "true"
+spec:
+  selector:
+    matchLabels:
+      run: {{ .Values.microservices.mserpadaptor.name }}
+  replicas: {{ .Values.microservices.mserpadaptor.replicaCount }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/instance: {{ .Values.microservices.mserpadaptor.name }}
+        project: {{ .Values.project }}
+        run: {{ .Values.microservices.mserpadaptor.name }}
+    spec:
+      containers:
+        - name: {{ .Values.microservices.mserpadaptor.name }}
+          image: {{ .Values.microservices.mserpadaptor.image }}:{{ .Values.microservices.mserpadaptor.version }}
+          imagePullPolicy: {{ .Values.microservices.mserpadaptor.pullPolicy }}
+          env:
+            - name: JHIPSTER_SECURITY_AUTHENTICATION_JWT_BASE64_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: jwt-secret-{{ .Values.microservices.mserpadaptor.name }}
+                  key: secret
+            - name: SERVICES_ERP_SECURITY_CREDENTIALS
+              valueFrom:
+                secretKeyRef:
+                  name: jwt-secret-{{ .Values.microservices.mserpadaptor.name }}
+                  key: securityCredentials
+          envFrom:
+            - configMapRef:
+                name: cm-{{ .Values.microservices.mserpadaptor.name }}
+          ports:
+            - containerPort: {{ .Values.microservices.mserpadaptor.containerPort }}
+              protocol: TCP
+          volumeMounts:
+            - name: tz-config
+              mountPath: /etc/localtime
+          readinessProbe:
+            httpGet:
+              path: /services/{{ .Values.microservices.mserpadaptor.name }}/management/health
+              port: {{ .Values.microservices.mserpadaptor.containerPort }}
+            initialDelaySeconds: {{ .Values.microservices.mserpadaptor.probe.readiness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.microservices.mserpadaptor.probe.readiness.periodSeconds }}
+            failureThreshold: {{ .Values.microservices.mserpadaptor.probe.readiness.failureThreshold }}
+          livenessProbe:
+            httpGet:
+              path: /services/{{ .Values.microservices.mserpadaptor.name }}/management/health
+              port: {{ .Values.microservices.mserpadaptor.containerPort }}
+            initialDelaySeconds: {{ .Values.microservices.mserpadaptor.probe.liveness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.microservices.mserpadaptor.probe.liveness.periodSeconds }}
+            failureThreshold: {{ .Values.microservices.mserpadaptor.probe.liveness.failureThreshold }}
+      volumes:
+        - name: tz-config
+          hostPath:
+            path: /usr/share/zoneinfo/America/Santiago
+      imagePullSecrets:
+        - name: {{ .Values.ociSecret.name }}

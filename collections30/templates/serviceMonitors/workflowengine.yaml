@@ -1,0 +1,23 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: metrics-{{ .Values.microservices.workflowengine.name }}
+  namespace: cattle-prometheus
+  labels:
+    app: {{ .Values.microservices.workflowengine.name }}
+    heritage: Tiller
+    io.cattle.field/appId: cluster-monitoring
+    release: cluster-monitoring
+    source: {{ .Values.microservices.workflowengine.name }}
+spec:
+  endpoints:
+  - interval: 30s
+    port: http
+    path: /services/workflowengine/management/prometheus
+  namespaceSelector:
+    matchNames:
+    - {{ .Values.namespace }}
+  selector:
+    matchLabels:
+       app.kubernetes.io/name: {{ .Values.microservices.workflowengine.name }}
+

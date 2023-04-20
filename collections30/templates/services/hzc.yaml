@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.microservices.bscs.services.hazelcast.name }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    app.kubernetes.io/instance: {{ .Values.microservices.bscs.services.hazelcast.name }}
+    project: {{ .Values.project }}
+spec:
+  type: {{ .Values.microservices.bscs.services.hazelcast.type }}
+  ports:
+    - port: {{ .Values.microservices.bscs.services.hazelcast.port }}
+      name: {{ .Values.microservices.bscs.services.hazelcast.protocol }}
+      targetPort: {{ .Values.microservices.bscs.services.hazelcast.targetPort }}
+  selector:
+    app: dpl-{{ .Values.microservices.bscs.name }}
+    app.kubernetes.io/instance: dpl-{{ .Values.microservices.bscs.name }}

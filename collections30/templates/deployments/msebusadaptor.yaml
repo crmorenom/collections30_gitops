@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.microservices.msebusadaptor.name }}
+  namespace: {{ .Values.namespace }}
+  annotations:
+    reloader.stakater.com/auto: "true"
+spec:
+  selector:
+    matchLabels:
+      run: {{ .Values.microservices.msebusadaptor.name }}
+  replicas: {{ .Values.microservices.msebusadaptor.replicaCount }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/instance: {{ .Values.microservices.msebusadaptor.name }}
+        project: {{ .Values.project }}
+        run: {{ .Values.microservices.msebusadaptor.name }}
+    spec:
+      containers:
+        - name: {{ .Values.microservices.msebusadaptor.name }}
+          image: {{ .Values.microservices.msebusadaptor.image }}:{{ .Values.microservices.msebusadaptor.version }}
+          imagePullPolicy: {{ .Values.microservices.msebusadaptor.pullPolicy }}
+          env:
+            - name: JHIPSTER_SECURITY_AUTHENTICATION_JWT_BASE64_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: jwt-secret-{{ .Values.microservices.msebusadaptor.name }}
+                  key: secret
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: jwt-secret-{{ .Values.microservices.msebusadaptor.name }}
+                  key: databasePassword
+          envFrom:
+            - configMapRef:
+                name: cm-{{ .Values.microservices.msebusadaptor.name }}
+          ports:
+            - containerPort: {{ .Values.microservices.msebusadaptor.containerPort }}
+              protocol: TCP
+          volumeMounts:
+            - name: tz-config
+              mountPath: /etc/localtime
+          readinessProbe:
+            httpGet:
+              path: /services/{{ .Values.microservices.msebusadaptor.name }}/management/health
+              port: {{ .Values.microservices.msebusadaptor.containerPort }}
+            initialDelaySeconds: {{ .Values.microservices.msebusadaptor.probe.readiness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.microservices.msebusadaptor.probe.readiness.periodSeconds }}
+            failureThreshold: {{ .Values.microservices.msebusadaptor.probe.readiness.failureThreshold }}
+          livenessProbe:
+            httpGet:
+              path: /services/{{ .Values.microservices.msebusadaptor.name }}/management/health
+              port: {{ .Values.microservices.msebusadaptor.containerPort }}
+            initialDelaySeconds: {{ .Values.microservices.msebusadaptor.probe.liveness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.microservices.msebusadaptor.probe.liveness.periodSeconds }}
+            failureThreshold: {{ .Values.microservices.msebusadaptor.probe.liveness.failureThreshold }}
+      volumes:
+        - name: tz-config
+          hostPath:
+            path: /usr/share/zoneinfo/America/Santiago
+      imagePullSecrets:
+        - name: {{ .Values.ociSecret.name }}

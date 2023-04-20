@@ -1,0 +1,21 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: in-{{ .Values.microservices.gateway.name }}-https
+  namespace: {{ .Values.namespace }}
+  labels:
+    app.kubernetes.io/instance: in-{{ .Values.microservices.gateway.name }}-https
+    project: {{ .Values.project }}
+spec:
+  rules:
+    - host: {{ .Values.microservices.gateway.ingress.domainNameHttps }}
+      http:
+        paths:
+        - backend:
+            serviceName: svc-{{ .Values.microservices.gateway.name }}
+            servicePort: {{ .Values.microservices.gateway.service.port }}
+          path: /
+  tls:
+    - hosts:
+        - {{ .Values.microservices.gateway.ingress.domainNameHttps }}
+      secretName: wildcard

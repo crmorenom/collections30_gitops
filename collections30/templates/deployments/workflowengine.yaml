@@ -1,0 +1,78 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.microservices.workflowengine.name }}
+  namespace: {{ .Values.namespace }}
+  annotations:
+    reloader.stakater.com/auto: "true"
+spec:
+  selector:
+    matchLabels:
+      run: {{ .Values.microservices.workflowengine.name }}
+  replicas: {{ .Values.microservices.workflowengine.replicaCount }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/instance: {{ .Values.microservices.workflowengine.name }}
+        project: {{ .Values.project }}
+        run: {{ .Values.microservices.workflowengine.name }}
+        app.kubernete.hazelcast.instance: {{ .Values.microservices.workflowengine.name }}
+    spec:
+      containers:
+        - name: {{ .Values.microservices.workflowengine.name }}
+          image: {{ .Values.microservices.workflowengine.image }}:{{ .Values.microservices.workflowengine.version }}
+          imagePullPolicy: {{ .Values.microservices.workflowengine.pullPolicy }}
+          env:
+            - name: JHIPSTER_SECURITY_AUTHENTICATION_JWT_BASE64_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: jwt-secret-{{ .Values.microservices.workflowengine.name }}
+                  key: secret
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: jwt-secret-{{ .Values.microservices.workflowengine.name }}
+                  key: databasePassword
+            - name: APP_HAZELCAST_CONFIG_KUBERNETES_SERVICENAME
+              value: hz-{{ .Values.microservices.workflowengine.name }}-service
+          envFrom:
+            - configMapRef:
+                name: cm-{{ .Values.microservices.workflowengine.name }}
+          ports:
+            - containerPort: {{ .Values.microservices.workflowengine.containerPort }}
+              protocol: TCP
+            - containerPort: {{ .Values.microservices.workflowengine.configmap.env.APP_HAZELCAST_CONFIG_PORT }}
+              protocol: TCP
+          volumeMounts:
+            - name: tz-config
+              mountPath: /etc/localtime
+          readinessProbe:
+            httpGet:
+              path: /services/{{ .Values.microservices.workflowengine.name }}/management/health
+              port: {{ .Values.microservices.workflowengine.containerPort }}
+            initialDelaySeconds: {{ .Values.microservices.workflowengine.probe.readiness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.microservices.workflowengine.probe.readiness.periodSeconds }}
+            failureThreshold: {{ .Values.microservices.workflowengine.probe.readiness.failureThreshold }}
+          resources:
+#            limits:
+#              cpu: "2"
+            requests:
+              cpu: "2"
+          livenessProbe:
+            httpGet:
+              path: /services/{{ .Values.microservices.workflowengine.name }}/management/health
+              port: {{ .Values.microservices.workflowengine.containerPort }}
+            initialDelaySeconds: {{ .Values.microservices.workflowengine.probe.liveness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.microservices.workflowengine.probe.liveness.periodSeconds }}
+            failureThreshold: {{ .Values.microservices.workflowengine.probe.liveness.failureThreshold }}
+          lifecycle:
+            preStop:
+              exec:
+                command: [ "curl", "-XPOST", "http://localhost:7182/services/workflowengine/management/shutdown" ]
+      terminationGracePeriodSeconds: 240
+      volumes:
+        - name: tz-config
+          hostPath:
+            path: /usr/share/zoneinfo/America/Santiago
+      imagePullSecrets:
+        - name: {{ .Values.ociSecret.name }}

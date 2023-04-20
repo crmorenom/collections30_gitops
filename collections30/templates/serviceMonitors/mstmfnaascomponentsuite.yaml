@@ -1,0 +1,23 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: metrics-{{ .Values.microservices.mstmfnaascomponentsuite.name }}
+  namespace: cattle-prometheus
+  labels:
+    app: {{ .Values.microservices.mstmfnaascomponentsuite.name }}
+    heritage: Tiller
+    io.cattle.field/appId: cluster-monitoring
+    release: cluster-monitoring
+    source: {{ .Values.microservices.mstmfnaascomponentsuite.name }}
+spec:
+  endpoints:
+  - interval: 30s
+    port: http
+    path: /services/mstmfnaascomponentsuite/management/prometheus
+  namespaceSelector:
+    matchNames:
+    - {{ .Values.namespace }}
+  selector:
+    matchLabels:
+       app.kubernetes.io/name: {{ .Values.microservices.mstmfnaascomponentsuite.name }}
+       

@@ -1,0 +1,69 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    reloader.stakater.com/auto: "true"
+  name: {{ .Values.microservices.bscs.name }}
+  namespace: {{ .Values.namespace }}
+  labels:
+     app.kubernetes.io/name: dpl-{{ .Values.microservices.bscs.services.bscs.name }}
+     app.kubernetes.io/instance: dpl-{{ .Values.microservices.bscs.name }}
+     app: dpl-{{ .Values.microservices.bscs.name }}
+spec:
+  selector:
+    matchLabels:
+      app: dpl-{{ .Values.microservices.bscs.name }}
+      run: {{ .Values.microservices.bscs.name }}
+  replicas: {{ .Values.microservices.bscs.replicaCount }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/instance: dpl-{{ .Values.microservices.bscs.name }}
+        app: dpl-{{ .Values.microservices.bscs.name }}
+        project: {{ .Values.project }}
+        run: {{ .Values.microservices.bscs.name }}
+    spec:
+      containers:
+        - name: {{ .Values.microservices.bscs.name }}
+          image: {{ .Values.microservices.bscs.image }}:{{ .Values.microservices.bscs.version }}
+          imagePullPolicy: {{ .Values.microservices.bscs.pullPolicy }}
+          env:
+            - name: DNS_BSCS_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: secret-{{ .Values.microservices.bscs.name }}
+                  key: username
+            - name: DNS_BSCS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: secret-{{ .Values.microservices.bscs.name }}
+                  key: password
+          envFrom:
+            - configMapRef:
+                name: cm-{{ .Values.microservices.bscs.name }}
+          ports:
+            - containerPort: {{ .Values.microservices.bscs.containerPort }}
+            - containerPort: {{ .Values.microservices.bscs.containerHZCPort }}
+          readinessProbe:
+            httpGet:
+              path: {{ .Values.microservices.bscs.probe.readiness.path }}
+              port: {{ .Values.microservices.bscs.containerPort }}
+            initialDelaySeconds: {{ .Values.microservices.bscs.probe.readiness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.microservices.bscs.probe.readiness.periodSeconds }}
+            failureThreshold: {{ .Values.microservices.bscs.probe.readiness.failureThreshold }}
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.microservices.bscs.probe.liveness.path }}
+              port: {{ .Values.microservices.bscs.containerPort }}
+            initialDelaySeconds: {{ .Values.microservices.bscs.probe.liveness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.microservices.bscs.probe.liveness.periodSeconds }}
+            failureThreshold: {{ .Values.microservices.bscs.probe.liveness.failureThreshold }}
+          volumeMounts:
+            - name: {{ .Values.microservices.bscs.volumeName }}
+              mountPath: {{ .Values.microservices.bscs.mountPath }}
+      volumes:
+        - name: {{ .Values.microservices.bscs.volumeName }}
+          hostPath:
+            path: {{ .Values.microservices.bscs.volumePath }}{{ .Values.microservices.bscs.timeZoneValue }}
+      imagePullSecrets:
+        - name: {{ .Values.ociSecret.name }}

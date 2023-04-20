@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.microservices.msapimadaptor.name }}
+  namespace: {{ .Values.namespace }}
+  annotations:
+    reloader.stakater.com/auto: "true"
+spec:
+  selector:
+    matchLabels:
+      run: {{ .Values.microservices.msapimadaptor.name }}
+  replicas: {{ .Values.microservices.msapimadaptor.replicaCount }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/instance: {{ .Values.microservices.msapimadaptor.name }}
+        project: {{ .Values.project }}
+        run: {{ .Values.microservices.msapimadaptor.name }}
+    spec:
+      containers:
+        - name: {{ .Values.microservices.msapimadaptor.name }}
+          image: {{ .Values.microservices.msapimadaptor.image }}:{{ .Values.microservices.msapimadaptor.version }}
+          imagePullPolicy: {{ .Values.microservices.msapimadaptor.pullPolicy }}
+          env:
+            - name: JHIPSTER_SECURITY_AUTHENTICATION_JWT_BASE64_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: jwt-secret-{{ .Values.microservices.msapimadaptor.name }}
+                  key: secret
+            - name: SERVICES_APIM_CLIENTID
+              valueFrom:
+                secretKeyRef:
+                  name: jwt-secret-{{ .Values.microservices.msapimadaptor.name }}
+                  key: clientId
+            - name: SERVICES_APIM_CLIENTSECRET
+              valueFrom:
+                secretKeyRef:
+                  name: jwt-secret-{{ .Values.microservices.msapimadaptor.name }}
+                  key: clientSecret
+          envFrom:
+            - configMapRef:
+                name: cm-{{ .Values.microservices.msapimadaptor.name }}
+          ports:
+            - containerPort: {{ .Values.microservices.msapimadaptor.containerPort }}
+              protocol: TCP
+          volumeMounts:
+            - name: tz-config
+              mountPath: /etc/localtime
+          readinessProbe:
+            httpGet:
+              path: /services/{{ .Values.microservices.msapimadaptor.name }}/management/health
+              port: {{ .Values.microservices.msapimadaptor.containerPort }}
+            initialDelaySeconds: {{ .Values.microservices.msapimadaptor.probe.readiness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.microservices.msapimadaptor.probe.readiness.periodSeconds }}
+            failureThreshold: {{ .Values.microservices.msapimadaptor.probe.readiness.failureThreshold }}
+          livenessProbe:
+            httpGet:
+              path: /services/{{ .Values.microservices.msapimadaptor.name }}/management/health
+              port: {{ .Values.microservices.msapimadaptor.containerPort }}
+            initialDelaySeconds: {{ .Values.microservices.msapimadaptor.probe.liveness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.microservices.msapimadaptor.probe.liveness.periodSeconds }}
+            failureThreshold: {{ .Values.microservices.msapimadaptor.probe.liveness.failureThreshold }}
+      volumes:
+        - name: tz-config
+          hostPath:
+            path: /usr/share/zoneinfo/America/Santiago
+      imagePullSecrets:
+        - name: {{ .Values.ociSecret.name }}

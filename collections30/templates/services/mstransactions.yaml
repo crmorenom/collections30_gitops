@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-{{ .Values.microservices.msentitytransactions.name }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    app.kubernetes.io/instance: {{ .Values.microservices.msentitytransactions.name }}
+    project: {{ .Values.project }}
+    app.kubernetes.io/name: {{ .Values.microservices.msentitytransactions.name }}
+spec:
+  type: {{ .Values.microservices.msentitytransactions.service.type }}
+  ports:
+    - port: 80
+      name: http
+      targetPort: {{ .Values.microservices.msentitytransactions.service.port }}
+    - port: {{ .Values.microservices.msentitytransactions.configmap.env.APP_HAZELCAST_CONFIG_PORT }}
+      name: hazelcast       
+  selector:
+    app.kubernetes.io/instance: {{ .Values.microservices.msentitytransactions.name }}

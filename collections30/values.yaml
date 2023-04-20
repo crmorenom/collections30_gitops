@@ -1,0 +1,876 @@
+project: collections30
+namespace: collections30
+
+microservices:
+  gateway:
+    name: gateway
+    image: iad.ocir.io/tdecloud/tdecloud_repository/collections30/gateway
+    version: 2.0.3
+    pullPolicy: Always
+    replicaCount: 4
+    containerPort: 9090
+    configmap:
+      env:
+        SPRING_PROFILES_ACTIVE: prod
+        SPRING_DATASOURCE_URL: jdbc:oracle:thin:@10.52.130.35:1521/MSPRD
+        SPRING_DATASOURCE_USERNAME: COLLECTIONS_GATEWAY
+        SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.Oracle12cDialect
+        SPRING_JPA_DATABASE: ORACLE
+        SPRING_SLEUTH_PROPAGATION_KEYS: 'x-request-id,x-ot-span-context'
+        _JAVA_OPTIONS: ' -Xmx1024m -Xms1024m'
+        APP_HAZELCAST_CONFIG_INSTANCENAME: gateway
+        APP_HAZELCAST_CONFIG_PORT: 5701
+        APP_HAZELCAST_CONFIG_KUBERNETES_ENABLED: true
+        APP_HAZELCAST_CONFIG_KUBERNETES_NAMESPACE: collections30
+        APP_HAZELCAST_CONFIG_KUBERNETES_SERVICENAME: svc-gateway
+        LOGGING_LEVEL_ROOT: INFO
+        LOGGING_LEVEL_IO_GITHUB_JHIPSTER: INFO
+        LOGGING_LEVEL_COM_READINESSIT_ADAPTORS: INFO
+        SPRING_LIQUIBASE_PARAMETERS_TABLESPACE_HISTORIC: GATEWAY_DATA
+        SPRING_LIQUIBASE_PARAMETERS_TABLESPACE_RUNTIME: GATEWAY_DATA
+        SPRING_LIQUIBASE_PARAMETERS_TABLESPACE_CONFIG: GATEWAY_DATA
+        SPRING_LIQUIBASE_PARAMETERS_PARTITION_INITIALDATE: '2020-11-06 00:00:00'
+        SPRING_LIQUIBASE_PARAMETERS_TABLESPACE_IDX_HISTORIC: GATEWAY_INX
+        SPRING_LIQUIBASE_PARAMETERS_TABLESPACE_IDX_RUNTIME: GATEWAY_INX
+        SPRING_LIQUIBASE_PARAMETERS_TABLESPACE_IDX_CONFIG: GATEWAY_INX
+        ZUUL_ROUTES_WORKFLOWENGINE_PATH: /services/workflowengine/**
+        ZUUL_ROUTES_WORKFLOWENGINE_URL: http://svc-workflowengine.collections30.svc.cluster.local/services/workflowengine
+        ZUUL_ROUTES_MSTMFCUSTOMERMANAGEMENT_PATH: /services/mstmfcustomermanagement/**
+        ZUUL_ROUTES_MSTMFCUSTOMERMANAGEMENT_URL: http://svc-mstmfcustomermanagement.collections30.svc.cluster.local/services/mstmfcustomermanagement
+        ZUUL_ROUTES_MSENTITYTRANSACTIONS_PATH: /services/msentitytransactions/**
+        ZUUL_ROUTES_MSENTITYTRANSACTIONS_URL: http://svc-msentitytransactions.collections30.svc.cluster.local/services/msentitytransactions
+        ZUUL_ROUTES_ORDERCAREADAPTOR_PATH: /services/ordercareadaptor/**
+        ZUUL_ROUTES_ORDERCAREADAPTOR_URL: http://svc-ordercareadaptor.collections30.svc.cluster.local/services/ordercareadaptor
+        ZUUL_ROUTES_MSTMFSERVICEACTIVATIONANDCONFIGURATION_PATH: /services/mstmfserviceactivationandconfiguration/**
+        ZUUL_ROUTES_MSTMFSERVICEACTIVATIONANDCONFIGURATION_URL: http://svc-mstmfserviceactivationandconfiguration.collections30.svc.cluster.local/services/mstmfserviceactivationandconfiguration
+        ZUUL_ROUTES_MSTMFCOMMUNICATION_PATH: /services/mstmfcommunication/**
+        ZUUL_ROUTES_MSTMFCOMMUNICATION_URL: http://svc-mstmfcommunication.collections30.svc.cluster.local/services/mstmfcommunication
+        ZUUL_ROUTES_MSTMFACCOUNTMANAGEMENT_PATH: /services/mstmfaccountmanagement/**
+        ZUUL_ROUTES_MSTMFACCOUNTMANAGEMENT_URL: http://svc-mstmfaccountmanagement.collections30.svc.cluster.local/services/mstmfaccountmanagement
+        ZUUL_ROUTES_MSCHANNELSADAPTOR_PATH: /services/channelsadaptor/**
+        ZUUL_ROUTES_MSCHANNELSADAPTOR_URL: http://svc-mschannelsadaptor.collections30.svc.cluster.local/services/channelsadaptor
+        ZUUL_ROUTES_MSCHANNELSADAPTORWS_PATH: /services/mschannelsadaptorws/**
+        ZUUL_ROUTES_MSCHANNELSADAPTORWS_URL: http://svc-mschannelsadaptorws.collections30.svc.cluster.local/services/mschannelsadaptorws
+        ZUUL_ROUTES_MSENTITYNOTIFICATIONS_PATH: /services/msentitynotifications/**
+        ZUUL_ROUTES_MSENTITYNOTIFICATIONS_URL: http://svc-msentitynotifications.collections30.svc.cluster.local/services/msentitynotifications
+        ZUUL_ROUTES_MSAPIMADAPTOR_PATH: /services/msapimadaptor/**
+        ZUUL_ROUTES_MSAPIMADAPTOR_URL: http://svc-msapimadaptor.collections30.svc.cluster.local/services/msapimadaptor
+        ZUUL_ROUTES_MSERPADAPTOR_PATH: /services/mserpadaptor/**
+        ZUUL_ROUTES_MSERPADAPTOR_URL: http://svc-mserpadaptor.collections30.svc.cluster.local/services/mserpadaptor
+        ZUUL_ROUTES_MSTMFNAASCOMPONENTSUITE_PATH: /services/mstmfnaascomponentsuite/**
+        ZUUL_ROUTES_MSTMFNAASCOMPONENTSUITE_URL: http://svc-mstmfnaascomponentsuite.collections30.svc.cluster.local/services/mstmfnaascomponentsuite
+        ZUUL_ROUTES_SCHEDULER_PATH:  /services/schedulermanager/**
+        ZUUL_ROUTES_SCHEDULER_URL: http://svc-schedulermanager.collections30.svc.cluster.local/services/schedulermanager
+        ZUUL_ROUTES_MSTMFPREPAYBALANCEMANAGEMENT_PATH: /services/mstmfprepaybalancemanagement/**
+        ZUUL_ROUTES_MSTMFPREPAYBALANCEMANAGEMENT_URL: http://svc-mstmfprepaybalancemanagement.collections30.svc.cluster.local/services/mstmfprepaybalancemanagement
+        ZUUL_ROUTES_MSECMADAPTOR_PATH: /services/msecmadaptor/**
+        ZUUL_ROUTES_MSECMADAPTOR_URL: http://svc-msecmadaptor.collections30.svc.cluster.local/services/msecmadaptor
+        ZUUL_ROUTES_MSEBUSADAPTOR_PATH: /services/msebusadaptor/**
+        ZUUL_ROUTES_MSEBUSADAPTOR_URL: http://svc-msebusadaptor.collections30.svc.cluster.local/services/msebusadaptor
+        ZUUL_ROUTES_MSBSCSADAPTOR_PATH: /services/msbscsadaptor/**
+        ZUUL_ROUTES_MSBSCSADAPTOR_URL: http://bscs-service.collections30.svc.cluster.local/api/collections
+        MANAGEMENT_METRICS_EXPORT_PROMETHEUS_ENABLED: true
+    service:
+      type: ClusterIP
+      port: 9090
+    probe:
+      readiness:
+        initialDelaySeconds: 40
+        periodSeconds: 10
+        failureThreshold: 25
+      liveness:
+        initialDelaySeconds: 40
+        periodSeconds: 10
+        failureThreshold: 25
+    ingress:
+      domainName: collections30-gateway.prodmicroservices.entel.cl
+      domainNameHttps: collections30-gateway-api.prodmicroservices.entel.cl
+  mstmfaccountmanagement:
+    name: mstmfaccountmanagement
+    image: iad.ocir.io/tdecloud/tdecloud_repository/collections30/mstmfaccountmanagement
+    version: 0.5.2
+    pullPolicy: Always
+    replicaCount: 11
+    containerPort: 8394
+    configmap:
+      env:
+        SPRING_PROFILES_ACTIVE: prod
+        SPRING_SLEUTH_PROPAGATION_KEYS: 'x-request-id,x-ot-span-context'
+        _JAVA_OPTIONS: ' -Xmx256m -Xms256m'
+        LOGGING_LEVEL_ROOT: INFO
+        LOGGING_LEVEL_IO_GITHUB_JHIPSTER: INFO
+        LOGGING_LEVEL_COM_READINESSIT_ADAPTORS: INFO
+        APP_ENDPOINTS_ROUTES_BSCS_HEADERS_SECURITY_USERNAME: ADMX
+        APP_ENDPOINTS_ROUTES_BSCS_URL_OCCBALANCEREAD: 'http://vipssopub80.tdeprdcl.internal:36762/wsi/services/'
+        APP_ENDPOINTS_ROUTES_BSCS_URL_CONTRACTREAD: 'http://vipssopub80.tdeprdcl.internal:36762/wsi/services/'
+        APP_ENDPOINTS_ROUTES_BSCS_URL_CONTRACTWRITE: 'http://vipssopub80.tdeprdcl.internal:36762/wsi/services/'
+        APP_ENDPOINTS_ROUTES_BSCS_URL_PRODUCTCFSWRITE: 'http://vipssopub80.tdeprdcl.internal:36762/wsi/services/'
+        APP_ENDPOINTS_ROUTES_BSCS_URL_PRODUCTCFSADD: 'http://vipssopub80.tdeprdcl.internal:36762/wsi/services/'
+        APP_ENDPOINTS_ROUTES_BSCS_URL_BOOKINGREQUESTWRITE: 'http://vipssopub80.tdeprdcl.internal:36762/wsi/services/'
+        APP_ENDPOINTS_ROUTES_BSCS_URL_BILLINGACCOUNTREAD: 'http://vipssopub80.tdeprdcl.internal:36762/wsi/services/'
+        APP_ENDPOINTS_ROUTES_BSCS_URL_CONTRACTSSEARCH: 'http://vipssopub80.tdeprdcl.internal:36762/wsi/services/'
+        MANAGEMENT_METRICS_EXPORT_PROMETHEUS_ENABLED: true
+    service:
+      type: ClusterIP
+      port: 8394
+    probe:
+      readiness:
+        initialDelaySeconds: 20
+        periodSeconds: 10
+        failureThreshold: 25
+      liveness:
+        initialDelaySeconds: 20
+        periodSeconds: 10
+        failureThreshold: 25
+  mschannelsadaptor:
+    name: mschannelsadaptor
+    image: iad.ocir.io/tdecloud/tdecloud_repository/collections30/channelsadaptor
+    version: 0.7.0
+    pullPolicy: Always
+    replicaCount: 4
+    containerPort: 8594
+    configmap:
+      env:
+        SPRING_PROFILES_ACTIVE: prod
+        SPRING_DATASOURCE_URL: jdbc:oracle:thin:@10.52.130.35:1521/MSPRD
+        SPRING_DATASOURCE_USERNAME: COLLECTIONS_CHANNELS
+        SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.Oracle12cDialect
+        SPRING_JPA_DATABASE: ORACLE
+        SPRING_SLEUTH_PROPAGATION_KEYS: 'x-request-id,x-ot-span-context'
+        _JAVA_OPTIONS: ' -Xmx1024m -Xms1024m'
+        LOGGING_LEVEL_ROOT: INFO
+        LOGGING_LEVEL_IO_GITHUB_JHIPSTER: INFO
+        LOGGING_LEVEL_COM_READINESSIT_ADAPTORS: INFO
+        COMMONS_SCHEDULER_SCHEDULER_SERVER_REPORT_URL: http://svc-schedulermanager.collections30.svc.cluster.local/services/schedulermanager/api/schedule/reporting
+        APP_ENDPOINTS_ROUTES_NOTIFICATION_REST_URL: 'http://svc-msentitynotifications.collections30.svc.cluster.local/services/msentitynotifications/entity/notification/v1/save'
+        APP_ENDPOINTS_ROUTES_NOTIFICATION_SOAP_URL: 'http://svc-msentitynotifications.collections30.svc.cluster.local/services/msentitynotifications/entity/notification/v1/save'
+        APP_ENDPOINTS_ROUTES_REACTIVATION_REST_URL: 'http://svc-msentitynotifications.collections30.svc.cluster.local/services/msentitynotifications/entity/reactivation/v1/save'
+        APP_ENDPOINTS_ROUTES_BLOCK_SOAP_URL: 'http://svc-msentitynotifications.collections30.svc.cluster.local/services/msentitynotifications/entity/block/v1/save'
+        APP_ENDPOINTS_ROUTES_BLOCK_REST_URL: 'http://svc-msentitynotifications.collections30.svc.cluster.local/services/msentitynotifications/entity/block/v1/save'
+        APP_HAZELCAST_JOINMODE: tcp
+        APP_HAZELCAST_CONFIG_INSTANCENAME: channelsadaptor
+        APP_HAZELCAST_CONFIG_PORT: 5701
+        APP_HAZELCAST_CONFIG_KUBERNETES_ENABLED: false
+        APP_HAZELCAST_CONFIG_KUBERNETES_NAMESPACE: collections30
+        APP_HAZELCAST_CONFIG_KUBERNETES_SERVICENAME: svc-mschannelsadaptor
+        SPRING_LIQUIBASE_PARAMETERS_TABLESPACE_HISTORIC: CHANNELS_DATA
+        SPRING_LIQUIBASE_PARAMETERS_TABLESPACE_RUNTIME: CHANNELS_DATA
+        SPRING_LIQUIBASE_PARAMETERS_TABLESPACE_CONFIG: CHANNELS_DATA
+        SPRING_LIQUIBASE_PARAMETERS_PARTITION_INITIALDATE: '2020-11-06 00:00:00'
+        SPRING_LIQUIBASE_PARAMETERS_TABLESPACE_IDX_HISTORIC: CHANNELS_INX
+        SPRING_LIQUIBASE_PARAMETERS_TABLESPACE_IDX_RUNTIME: CHANNELS_INX
+        SPRING_LIQUIBASE_PARAMETERS_TABLESPACE_IDX_CONFIG: CHANNELS_INX
+        MANAGEMENT_METRICS_EXPORT_PROMETHEUS_ENABLED: true
+    service:
+      type: ClusterIP
+      port: 8594
+    probe:
+      readiness:
+        initialDelaySeconds: 40
+        periodSeconds: 10
+        failureThreshold: 25
+      liveness:
+        initialDelaySeconds: 40
+        periodSeconds: 10
+        failureThreshold: 25
+  mschannelsadaptorws:
+    name: mschannelsadaptorws
+    image: iad.ocir.io/tdecloud/tdecloud_repository/collections30/mschannelsadaptorws
+    version: 0.2.4
+    pullPolicy: Always
+    replicaCount: 4
+    containerPort: 8298
+    configmap:
+      env:
+        SPRING_PROFILES_ACTIVE: prod
+        SPRING_SLEUTH_PROPAGATION_KEYS: 'x-request-id,x-ot-span-context'
+        _JAVA_OPTIONS: ' -Xmx1024m -Xms1024m'
+        LOGGING_LEVEL_ROOT: INFO
+        LOGGING_LEVEL_IO_GITHUB_JHIPSTER: INFO
+        LOGGING_LEVEL_COM_READINESSIT_ADAPTORS: INFO
+        APP_ENDPOINTS_ROUTES_CHANNELS_NOTIFICATION_URL: 'http://svc-mschannelsadaptor.collections30.svc.cluster.local/services/channelsadaptor/v1/customerBillManagement/notification'
+        APP_ENDPOINTS_ROUTES_CHANNELS_BLOCK_URL: 'http://svc-mschannelsadaptor.collections30.svc.cluster.local/services/channelsadaptor/v1/block'
+        MANAGEMENT_METRICS_EXPORT_PROMETHEUS_ENABLED: true
+    service:
+      type: ClusterIP
+      port: 8298
+    probe:
+      readiness:
+        initialDelaySeconds: 20
+        periodSeconds: 10
+        failureThreshold: 25
+      liveness:
+        initialDelaySeconds: 20
+        periodSeconds: 10
+        failureThreshold: 25
+  msentitynotifications:
+    name: msentitynotifications
+    image: iad.ocir.io/tdecloud/tdecloud_repository/collections30/msentitynotifications
+    version: 0.9.7
+    pullPolicy: Always
+    replicaCount: 12
+    containerPort: 8298
+    configmap:
+      env:
+        SPRING_PROFILES_ACTIVE: prod
+        SPRING_DATASOURCE_URL: jdbc:oracle:thin:@10.52.130.35:1521/MSPRD
+        SPRING_DATASOURCE_USERNAME: COLLECTIONS_NOTIFICATIONS
+        SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.Oracle12cDialect
+        SPRING_JPA_DATABASE: ORACLE
+        SPRING_SLEUTH_PROPAGATION_KEYS: 'x-request-id,x-ot-span-context'
+        _JAVA_OPTIONS: ' -Xmx1024m -Xms1024m'
+        LOGGING_LEVEL_ROOT: INFO
+        LOGGING_LEVEL_IO_GITHUB_JHIPSTER: INFO
+        LOGGING_LEVEL_COM_READINESSIT_ADAPTORS: INFO
+        APP_FLOWS_NOTIFICATION_URL: 'http://collections30-gateway.prodmicroservices.entel.cl/services/workflowengine/v1/execution/workflow/notificaciones/run'
+        APP_FLOWS_REACTIVATION_URL: 'http://collections30-gateway.prodmicroservices.entel.cl/services/workflowengine/v1/execution/workflow/reactivations/run'
+        APP_FLOWS_BLOCK_URL: 'http://collections30-gateway.prodmicroservices.entel.cl/services/workflowengine/v1/execution/workflow/block/run'
+        APP_FLOWS_NOTIFICATION_CALLBACKURL: 'http://collections30-gateway.prodmicroservices.entel.cl/services/msentitynotifications/entity/notification/v1/update/'
+        APP_FLOWS_REACTIVATION_CALLBACKURL: 'http://collections30-gateway.prodmicroservices.entel.cl/services/msentitynotifications/entity/reactivation/v1/update/'
+        APP_FLOWS_BLOCK_CALLBACKURL: 'http://collections30-gateway.prodmicroservices.entel.cl/services/msentitynotifications/entity/block/v1/update/'
+        COMMONS_SCHEDULER_SCHEDULER_SERVER_REPORT_URL: http://svc-schedulermanager.collections30.svc.cluster.local/services/schedulermanager/api/schedule/reporting
+        APP_HAZELCAST_CONFIG_INSTANCENAME: msentitynotifications
+        APP_HAZELCAST_CONFIG_PORT: 5701
+        APP_HAZELCAST_CONFIG_KUBERNETES_ENABLED: true
+        APP_HAZELCAST_CONFIG_KUBERNETES_NAMESPACE: collections30
+        APP_HAZELCAST_CONFIG_KUBERNETES_SERVICENAME: svc-msentitynotifications
+        SPRING_LIQUIBASE_PARAMETERS_TABLESPACE_HISTORIC: NOTIFICATIONS_DATA
+        SPRING_LIQUIBASE_PARAMETERS_TABLESPACE_RUNTIME: NOTIFICATIONS_DATA
+        SPRING_LIQUIBASE_PARAMETERS_TABLESPACE_CONFIG: NOTIFICATIONS_DATA
+        SPRING_LIQUIBASE_PARAMETERS_PARTITION_INITIALDATE: '2020-11-06 00:00:00'
+        SPRING_LIQUIBASE_PARAMETERS_TABLESPACE_IDX_HISTORIC: NOTIFICATIONS_INX
+        SPRING_LIQUIBASE_PARAMETERS_TABLESPACE_IDX_RUNTIME: NOTIFICATIONS_INX
+        SPRING_LIQUIBASE_PARAMETERS_TABLESPACE_IDX_CONFIG: NOTIFICATIONS_INX
+        MANAGEMENT_METRICS_EXPORT_PROMETHEUS_ENABLED: true
+    service:
+      type: ClusterIP
+      port: 8298
+    probe:
+      readiness:
+        initialDelaySeconds: 40
+        periodSeconds: 10
+        failureThreshold: 25
+      liveness:
+        initialDelaySeconds: 40
+        periodSeconds: 10
+        failureThreshold: 25
+    ingress:
+      domainName: collections30-gateway.prodmicroservices.entel.cl
+  workflowengine:
+    name: workflowengine
+    image: iad.ocir.io/tdecloud/tdecloud_repository/collections30/workflow-engine
+    version: 2.7.10
+    pullPolicy: Always
+    replicaCount: 13
+    containerPort: 7182
+    configmap:
+      env:
+        SPRING_PROFILES_ACTIVE: prod
+        SPRING_DATASOURCE_URL: jdbc:oracle:thin:@10.52.130.35:1521/MSPRD
+        SPRING_DATASOURCE_USERNAME: COLLECTIONS_WORKFLOWENGINE
+        SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.Oracle12cDialect
+        SPRING_JPA_DATABASE: ORACLE
+        SPRING_JPA_PROPERTIES_HIBERNATE_JDBC_BATCH_SIZE: 25
+        SPRING_JPA_PROPERTIES_HIBERNATE_ORDER_INSERTS: true
+        SPRING_JPA_PROPERTIES_HIBERNATE_ORDER_UPDATES: true
+        SPRING_DATASOURCE_HIKARI_MAXIMUMPOOLSIZE: 30
+        SPRING_SLEUTH_PROPAGATION_KEYS: 'x-request-id,x-ot-span-context'
+        _JAVA_OPTIONS: ' -Xmx3072m -Xms3072m -Dhazelcast.shutdownhook.policy=GRACEFUL -Dhazelcast.graceful.shutdown.max.wait=120'
+        LOGGING_LEVEL_ROOT: INFO
+        LOGGING_LEVEL_IO_GITHUB_JHIPSTER: INFO
+        LOGGING_LEVEL_COM_READINESSIT_WORKFLOWENGINE: INFO
+        WORKFLOWENGINE_SCHEDULER_RETRY_LESSTIMEVALUE: 10
+        WORKFLOWENGINE_SCHEDULER_RETRY_LESSTIMEUNITS: MINUTES
+        WORKFLOWENGINE_SCHEDULER_RETRY_MODE: http
+        WORKFLOWENGINE_SCHEDULER_RETRY_HTTP_URL: 'http://collections30-gateway.prodmicroservices.entel.cl/services/workflowengine/v1/execution/workflow/{workflowid}/retry'
+        WORKFLOWENGINE_MESSENGER_PROVIDER: jms
+        WORKFLOWENGINE_RETRIES_MAXDELAY: 30000
+        WORKFLOWENGINE_REPOSITORY_CONTEXT_PROVIDER: hz
+        WORKFLOWENGINE_REPOSITORY_CONTEXT_TTL: 3600000
+        WORKFLOWENGINE_REPOSITORY_WORKFLOWEXECUTION_PROVIDER: hz
+        WORKFLOWENGINE_REPOSITORY_WORKFLOWEXECUTION_TTL: 3600000
+        WORKFLOWENGINE_REPOSITORY_TASKEXECUTION_PROVIDER: hz
+        WORKFLOWENGINE_REPOSITORY_TASKEXECUTION_TTL: 3600000
+        HAZELCAST_JOIN_MODE: tcp
+        APP_HAZELCAST_CONFIG_INSTANCENAME: workflowengine
+        APP_HAZELCAST_CONFIG_PORT: 5701
+        APP_HAZELCAST_CONFIG_KUBERNETES_ENABLED: true
+        APP_HAZELCAST_CONFIG_KUBERNETES_NAMESPACE: collections30
+        SERVICES_HAZELCAST_MAZSIZEPOLICY: USED_HEAP_PERCENTAGE
+        SERVICES_CONTEXTSERVICE_MAPCONFIG_ACTIVE: true
+        SERVICES_CONTEXTSERVICE_MAPCONFIG_NAME: context
+        SERVICES_CONTEXTSERVICE_MAPCONFIG_MAXSIZE: 5
+        SERVICES_CONTEXTSERVICE_MAPCONFIG_BACKUPCOUNT: 0
+        SERVICES_CONTEXTSERVICE_MAPCONFIG_TIMETOLIVESECONDS: 60
+        SERVICES_CONTEXTSERVICE_MAPCONFIG_MAPSTORE_WRITEDELAYSECONDS: 0
+        SERVICES_WORKFLOWEXECUTIONSERVICE_MAPCONFIG_ACTIVE: true
+        SERVICES_WORKFLOWEXECUTIONSERVICE_MAPCONFIG_NAME: workflowExecution
+        SERVICES_WORKFLOWEXECUTIONSERVICE_MAPCONFIG_MAXSIZE: 12
+        SERVICES_WORKFLOWEXECUTIONSERVICE_MAPCONFIG_BACKUPCOUNT: 0
+        SERVICES_WORKFLOWEXECUTIONSERVICE_MAPCONFIG_TIMETOLIVESECONDS: 120
+        SERVICES_WORKFLOWEXECUTIONSERVICE_MAPCONFIG_MAPSTORE_WRITEDELAYSECONDS: 10
+        SERVICES_TASKEXECUTIONSERVICE_MAPCONFIG_ACTIVE: true
+        SERVICES_TASKEXECUTIONSERVICE_MAPCONFIG_NAME: taskExecution
+        SERVICES_TASKEXECUTIONSERVICE_MAPCONFIG_MAXSIZE: 12
+        SERVICES_TASKEXECUTIONSERVICE_MAPCONFIG_BACKUPCOUNT: 0
+        SERVICES_TASKEXECUTIONSERVICE_MAPCONFIG_TIMETOLIVESECONDS: 60
+        SERVICES_TASKEXECUTIONSERVICE_MAPCONFIG_MAPSTORE_WRITEDELAYSECONDS: 5
+        RESTTEMPLATE_FACTORY_READTIMEOUT: 30000
+        RESTTEMPLATE_FACTORY_CONNECTTIMEOUT: 3000
+        SPRING_LIQUIBASE_PARAMETERS_TABLESPACE_HISTORIC: WORKFLOWENGINE_DATA
+        SPRING_LIQUIBASE_PARAMETERS_TABLESPACE_RUNTIME: WORKFLOWENGINE_DATA
+        SPRING_LIQUIBASE_PARAMETERS_TABLESPACE_CONFIG: WORKFLOWENGINE_DATA
+        SPRING_LIQUIBASE_PARAMETERS_PARTITION_INITIALDATE: '2020-11-06 00:00:00'
+        SPRING_LIQUIBASE_PARAMETERS_TABLESPACE_IDX_HISTORIC: WORKFLOWENGINE_INX
+        SPRING_LIQUIBASE_PARAMETERS_TABLESPACE_IDX_RUNTIME: WORKFLOWENGINE_INX
+        SPRING_LIQUIBASE_PARAMETERS_TABLESPACE_IDX_CONFIG: WORKFLOWENGINE_INX
+        MANAGEMENT_METRICS_EXPORT_PROMETHEUS_ENABLED: true
+        COMMONS_SCHEDULER_SCHEDULER_SERVER_REPORT_URL: http://svc-schedulermanager.collections30.svc.cluster.local/services/schedulermanager/api/schedule/reporting
+    service:
+      type: ClusterIP
+      port: 7182
+    probe:
+      readiness:
+        initialDelaySeconds: 40
+        periodSeconds: 10
+        failureThreshold: 25
+      liveness:
+        initialDelaySeconds: 40
+        periodSeconds: 10
+        failureThreshold: 25
+    ingress:
+      domainName: collections30-gateway.prodmicroservices.entel.cl
+  schedulermanager:
+    name: schedulermanager
+    image: iad.ocir.io/tdecloud/tdecloud_repository/collections30/schedulermanager
+    version: 1.2.4
+    pullPolicy: Always
+    replicaCount: 4
+    containerPort: 8980
+    configmap:
+      env:
+        SPRING_PROFILES_ACTIVE: prod
+        SPRING_DATASOURCE_URL: jdbc:oracle:thin:@10.52.130.35:1521/MSPRD
+        SPRING_DATASOURCE_USERNAME: COLLECTIONS_SCHEDULERMNG
+        SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.Oracle12cDialect
+        SPRING_JPA_DATABASE: ORACLE
+        SPRING_SLEUTH_PROPAGATION_KEYS: 'x-request-id,x-ot-span-context'
+        _JAVA_OPTIONS: ' -Xmx1024m -Xms1024m'
+        LOGGING_LEVEL_ROOT: INFO
+        LOGGING_LEVEL_IO_GITHUB_JHIPSTER: INFO
+        LOGGING_LEVEL_COM_READINESSIT: INFO
+        SPRING_LIQUIBASE_PARAMETERS_TABLESPACE_HISTORIC: SCHEDULERMNG_DATA
+        SPRING_LIQUIBASE_PARAMETERS_TABLESPACE_RUNTIME: SCHEDULERMNG_DATA
+        SPRING_LIQUIBASE_PARAMETERS_TABLESPACE_CONFIG: SCHEDULERMNG_DATA
+        SPRING_LIQUIBASE_PARAMETERS_PARTITION_INITIALDATE: '2020-11-06 00:00:00'
+        SPRING_LIQUIBASE_PARAMETERS_TABLESPACE_IDX_HISTORIC: SCHEDULERMNG_INX
+        SPRING_LIQUIBASE_PARAMETERS_TABLESPACE_IDX_RUNTIME: SCHEDULERMNG_INX
+        SPRING_LIQUIBASE_PARAMETERS_TABLESPACE_IDX_CONFIG: SCHEDULERMNG_INX
+        APP_HAZELCAST_CONFIG_INSTANCENAME: schedulermanager
+        APP_HAZELCAST_CONFIG_PORT: 5701
+        APP_HAZELCAST_CONFIG_KUBERNETES_ENABLED: true
+        APP_HAZELCAST_CONFIG_KUBERNETES_NAMESPACE: collections30
+        APP_HAZELCAST_CONFIG_KUBERNETES_SERVICENAME: svc-schedulermanager
+        MANAGEMENT_METRICS_EXPORT_PROMETHEUS_ENABLED: true
+        DATABASE_LIQUIBASE_EXTENDED_CHANGE_LOG: master-with-additional-data.xml
+        DATABASE_LIQUIBASE_DATA_CHANGE_LOG: master-collection-seeders.xml
+    service:
+      type: ClusterIP
+      port: 8980
+    probe:
+      readiness:
+        initialDelaySeconds: 40
+        periodSeconds: 10
+        failureThreshold: 25
+      liveness:
+        initialDelaySeconds: 40
+        periodSeconds: 10
+        failureThreshold: 25
+  msentitytransactions:
+    name: msentitytransactions
+    image: iad.ocir.io/tdecloud/tdecloud_repository/collections30/msentitytransactions
+    version: 0.4.6
+    pullPolicy: Always
+    replicaCount: 10
+    containerPort: 8494
+    configmap:
+      env:
+        SPRING_PROFILES_ACTIVE: prod
+        SPRING_DATASOURCE_URL: jdbc:oracle:thin:@10.52.130.35:1521/MSPRD
+        SPRING_DATASOURCE_USERNAME: COLLECTIONS_TRANSACTIONS
+        SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.Oracle12cDialect
+        SPRING_JPA_DATABASE: ORACLE
+        SPRING_SLEUTH_PROPAGATION_KEYS: 'x-request-id,x-ot-span-context'
+        _JAVA_OPTIONS: ' -Xmx1024m -Xms1024m'
+        LOGGING_LEVEL_ROOT: INFO
+        LOGGING_LEVEL_IO_GITHUB_JHIPSTER: INFO
+        LOGGING_LEVEL_COM_READINESSIT_ADAPTORS: INFO
+        COMMONS_SCHEDULER_SCHEDULER_SERVER_REPORT_URL: http://svc-schedulermanager.collections30.svc.cluster.local/services/schedulermanager/api/schedule/reporting
+        APP_HAZELCAST_CONFIG_INSTANCENAME: msentitytransactions
+        APP_HAZELCAST_CONFIG_PORT: 5701
+        APP_HAZELCAST_CONFIG_KUBERNETES_ENABLED: true
+        APP_HAZELCAST_CONFIG_KUBERNETES_NAMESPACE: collections30
+        APP_HAZELCAST_CONFIG_KUBERNETES_SERVICENAME: svc-msentitytransactions
+        SPRING_LIQUIBASE_PARAMETERS_TABLESPACE_HISTORIC: TRANSACTIONS_DATA
+        SPRING_LIQUIBASE_PARAMETERS_TABLESPACE_RUNTIME: TRANSACTIONS_DATA
+        SPRING_LIQUIBASE_PARAMETERS_TABLESPACE_CONFIG: TRANSACTIONS_DATA
+        SPRING_LIQUIBASE_PARAMETERS_PARTITION_INITIALDATE: '2020-11-06 00:00:00'
+        SPRING_LIQUIBASE_PARAMETERS_TABLESPACE_IDX_HISTORIC: TRANSACTIONS_INX
+        SPRING_LIQUIBASE_PARAMETERS_TABLESPACE_IDX_RUNTIME: TRANSACTIONS_INX
+        SPRING_LIQUIBASE_PARAMETERS_TABLESPACE_IDX_CONFIG: TRANSACTIONS_INX
+        MANAGEMENT_METRICS_EXPORT_PROMETHEUS_ENABLED: true
+    service:
+      type: ClusterIP
+      port: 8494
+    probe:
+      readiness:
+        initialDelaySeconds: 40
+        periodSeconds: 10
+        failureThreshold: 25
+      liveness:
+        initialDelaySeconds: 40
+        periodSeconds: 10
+        failureThreshold: 25
+  mstmfserviceactivationandconfiguration:
+    name: mstmfserviceactivationandconfiguration
+    image: iad.ocir.io/tdecloud/tdecloud_repository/collections30/mstmfdms
+    version: 0.1.3
+    pullPolicy: Always
+    replicaCount: 4
+    containerPort: 8081
+    configmap:
+      env:
+        SPRING_PROFILES_ACTIVE: prod
+        SPRING_SLEUTH_PROPAGATION_KEYS: 'x-request-id,x-ot-span-context'
+        _JAVA_OPTIONS: ' -Xmx256m -Xms256m'
+        LOGGING_LEVEL_ROOT: INFO
+        LOGGING_LEVEL_IO_GITHUB_JHIPSTER: INFO
+        LOGGING_LEVEL_COM_READINESSIT_ADAPTORS: INFO
+        APP_ENDPOINTS_ROUTES_DMS_URL: 'http://10.51.25.151:8080/rest/records?property={type}&value={value}&limit=1'
+        MANAGEMENT_METRICS_EXPORT_PROMETHEUS_ENABLED: true
+    service:
+      type: ClusterIP
+      port: 8081
+    probe:
+      readiness:
+        initialDelaySeconds: 20
+        periodSeconds: 10
+        failureThreshold: 25
+      liveness:
+        initialDelaySeconds: 20
+        periodSeconds: 10
+        failureThreshold: 25
+  mstmfcustomermanagement:
+    name: mstmfcustomermanagement
+    image: iad.ocir.io/tdecloud/tdecloud_repository/collections30/mstmfcustomermanagement
+    version: 0.4.0
+    pullPolicy: Always
+    replicaCount: 6
+    containerPort: 8494
+    configmap:
+      env:
+        SPRING_PROFILES_ACTIVE: prod
+        SPRING_SLEUTH_PROPAGATION_KEYS: 'x-request-id,x-ot-span-context'
+        _JAVA_OPTIONS: ' -Xmx256m -Xms256m'
+        LOGGING_LEVEL_ROOT: INFO
+        LOGGING_LEVEL_IO_GITHUB_JHIPSTER: INFO
+        LOGGING_LEVEL_COM_READINESSIT_ADAPTORS: INFO
+        APP_ENDPOINTS_ROUTES_SIEBEL_GETCUSTOMERACCOUNT: 'http://vipsiebel80.entel.cl/eai_collec_anon_esn/start.swe?SWEExtSource=AnonWebService&SWEExtCmd=Execute&Servicio=GetCustomerAccount'
+        APP_ENDPOINTS_ROUTES_SIEBEL_CREATEUPDATESERVICE: 'http://vipsiebel80.entel.cl/eai_collec_anon_esn/start.swe?SWEExtSource=AnonWebService&SWEExtCmd=Execute&Servicio=CreateUpdateServiceRequest'
+        APP_ENDPOINTS_ROUTES_ODS_APIMADAPTOR: 'http://svc-msapimadaptor.collections30.svc.cluster.local/services/msapimadaptor/api/v1/apim/genericCall'
+        APP_ENDPOINTS_ROUTES_EBUS_URL: 'http://svc-msebusadaptor.collections30.svc.cluster.local/services/msebusadaptor/sap/updateCustomerAccountReceivable'
+        APP_ENDPOINTS_ROUTES_ODS_APPLICATIONCODE: 'MIC-SER'
+        APP_ENDPOINTS_ROUTES_ODS_ORIGENSYSTEM: '0329'
+        APP_ENDPOINTS_ROUTES_ODS_COUNTRYCODE: 'CHL'
+        APP_ENDPOINTS_ROUTES_ODS_GETCUSTOMERACCOUNT_HEADERS_OPERATIONCODE: 'AASS100906'
+        APP_ENDPOINTS_ROUTES_ODS_UPDATECUSTOMERACCOUNT_HEADERS_OPERATIONCODE: 'AASS001125'
+        MANAGEMENT_METRICS_EXPORT_PROMETHEUS_ENABLED: true
+    service:
+      type: ClusterIP
+      port: 8494
+    probe:
+      readiness:
+        initialDelaySeconds: 20
+        periodSeconds: 10
+        failureThreshold: 25
+      liveness:
+        initialDelaySeconds: 20
+        periodSeconds: 10
+        failureThreshold: 25
+  mstmfcommunication:
+    name: mstmfcommunication
+    image: iad.ocir.io/tdecloud/tdecloud_repository/collections30/tmf-communication
+    version: 0.3.17
+    pullPolicy: Always
+    replicaCount: 4
+    containerPort: 8294
+    configmap:
+      env:
+        SPRING_PROFILES_ACTIVE: prod
+        SPRING_SLEUTH_PROPAGATION_KEYS: 'x-request-id,x-ot-span-context'
+        _JAVA_OPTIONS: ' -Xmx256m -Xms256m'
+        LOGGING_LEVEL_ROOT: INFO
+        LOGGING_LEVEL_IO_GITHUB_JHIPSTER: INFO
+        LOGGING_LEVEL_COM_READINESSIT_ADAPTORS: INFO
+        APP_ENDPOINTS_ROUTES_CIS_URL: 'http://10.51.17.93:8081/create_notification'
+        APP_ENDPOINTS_ROUTES_IVR_URL: 'http://svc-msapimadaptor.collections30.svc.cluster.local/services/msapimadaptor/api/v1/apim/genericCall'
+        MANAGEMENT_METRICS_EXPORT_PROMETHEUS_ENABLED: true
+    service:
+      type: ClusterIP
+      port: 8294
+    probe:
+      readiness:
+        initialDelaySeconds: 20
+        periodSeconds: 10
+        failureThreshold: 25
+      liveness:
+        initialDelaySeconds: 20
+        periodSeconds: 10
+        failureThreshold: 25
+  ordercareadaptor:
+    name: ordercareadaptor
+    image: iad.ocir.io/tdecloud/tdecloud_repository/collections30/ordercareadaptor
+    version: 1.6.2
+    pullPolicy: Always
+    replicaCount: 10
+    containerPort: 9096
+    configmap:
+      env:
+        SPRING_PROFILES_ACTIVE: prod
+        SPRING_SLEUTH_PROPAGATION_KEYS: 'x-request-id,x-ot-span-context'
+        _JAVA_OPTIONS: ' -Xmx512m -Xms512m'
+        LOGGING_LEVEL_ROOT: INFO
+        LOGGING_LEVEL_IO_GITHUB_JHIPSTER: INFO
+        LOGGING_LEVEL_COM_READINESSIT_ADAPTORS: INFO
+        SERVICES_EOC_USERNAME: 'EUSBUSER'
+        #APP_SERVICES_EOC_ENABLED: 'false'
+        SERVICES_EOC_SERVICE_REGISTRY_ENABLE_JDBC_FALLBACK: false
+        SERVICES_EOC_RUNNING_ORDER_ENDPOINT: 'http://vipeocint7005.tdeprdcl.internal:7005/eoc/integration/v1/productOrderValidation/getRunningOrders'
+        SERVICES_EOC_GET_ASSET_ENDPOINT: 'http://vipeocint7005.tdeprdcl.internal:7005/eoc/eocadaptor/sr/v1/product/'
+        SERVICES_EOC_SERVICE_REGISTRY_ENDPOINT: 'http://vipeocint7005.tdeprdcl.internal:7005/eoc/eocadaptor/sr/v1/product/{productId}'
+        SERVICES_EOC_SERVICE_REGISTRY_COMPLETE_ENDPOINT: 'http://vipeocint7005.tdeprdcl.internal:7005/eoc/eocadaptor/sr/v1/srComplete'
+        SERVICES_EOC_PRODUCT_ORDER_ENDPOINT: 'http://vipeocint7005.tdeprdcl.internal:7005/eoc/integration/v2/ProductOrder/'
+        SERVICES_EOC_GETSUSPENSIONTRANSACTION_ENDPOINT: 'http://vipeocint7005.tdeprdcl.internal:7005/eoc/eocadaptor/common/getSuspensionTransaction'
+        SERVICES_EOC_GETSUSPENSIONTRANSACTION_ACTIONSENDPOINT: 'http://vipeocint7005.tdeprdcl.internal:7005/eoc/referenceData/v1/collection/suspensionTransition'
+        SERVICES_EOC_ASSETLIST_BILLINGID_ENDPOINT: 'http://vipeocint7005.tdeprdcl.internal:7005/eoc/eocadaptor/sr/v1/product/assetListAlt'
+        SERVICES_EOC_GETSUSPENSIONTRANSACTION_DUNNINGACTIONSJSON: '["S2", "S4", "S1278", "SNOPA"]'
+        SERVICES_EOC_GETSUSPENSIONTRANSACTION_DUNNINGACTIONSAPPROVALJSON: '["REACT"]'
+        SERVICES_EOC_GETSUSPENSIONTRANSACTION_TRANSITIONACTIONREACTIVATEJSON: '["Reactivate"]'
+        SERVICES_EOC_GETSUSPENSIONTRANSACTION_TRANSITIONACTIONSUSPENDJSON: '["Suspend"]'
+        SERVICES_EOC_GETSUSPENSIONTRANSACTION_DEFAULTACTIONMAPJSON: '{ "HomeDTH": [ { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "country", "value": "chile", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "actionId", "value": "DTHBlock", "valueType": "string" } ], "HomeIPTV": [ { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "actionId", "value": "SuspendTV", "valueType": "string" } ], "HomeInternet": [ { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "actionId", "value": "SuspendInternet", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "realm", "value": "isp", "valueType": "string" } ], "HomeVOIP": [ { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "actionId", "value": "SuspendOutVOIP", "valueType": "string" } ], "HomeWirelessBAFI": [ { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "actionId", "value": "BafiBlockServices", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "hlrUserProv", "value": "1", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "hlrUserKeep", "value": "1", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "hlrUserBs2g", "value": "0", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "hlrUserBs3g", "value": "0", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "epsUserOdb", "value": "ODB-ALL", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "epsUserBarRoaming4g", "value": "1", "valueType": "string" } ], "HomeWirelessTFI": [ { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "actionId", "value": "TFIBlockServices", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "hlrUserBarVoiceOut", "value": "1", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "hlrUserBarSmsOut", "value": "1", "valueType": "string" } ], "MobilePostpaid": [ { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "actionId", "value": "PostPaidBlockServices", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "hlrUserProv", "value": "1", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "hlrUserObr", "value": "1", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "hlrUserBarVoiceOut", "value": "1", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "hlrUserBarSmsOut", "value": "1", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "hlrUserBs2g", "value": "0", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "hlrUserBs3g", "value": "0", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "epsUserOdb", "value": "ODB-ALL", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "epsUserBarRoaming4g", "value": "1", "valueType": "string" } ], "Volte": [ { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "subscriptionType", "value": "postpaid", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "actionId", "value": "VolteSuppServ", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "supplementaryServicesIcb", "value": "0", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "supplementaryServicesOcb", "value": "1", "valueType": "string" } ] }'
+        SERVICES_EOC_GETSUSPENSIONTRANSACTION_ACTIONSJSON: '{ "Baja": { "Gestion": [ { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "actionId", "value": "DeActivateGestion", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "realm", "value": "isp", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "delConfig", "value": "TRUE", "valueType": "string" } ], "HomeDTH": [ { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "country", "value": "chile", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "actionId", "value": "DTHDeleteDeco", "valueType": "string" } ], "HomeChannelDTH":[ { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "actionId", "value": "DTHDeactivatePremium", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "country", "value": "chile", "valueType": "string" } ], "HomeIPTV": [ { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "actionId", "value": "DeActivateTV", "valueType": "string" } ], "HomeChannelIPTV" : [ { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "actionId", "value": "DeletePremium", "valueType": "string" } ], "HomeInternet": [ { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "actionId", "value": "DeActivateInternet", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "realm", "value": "isp", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "delConfig", "value": "TRUE", "valueType": "string" } ], "HomeVOIP": [ { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "actionId", "value": "DeActivateVOIP", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "realm", "value": "isp", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "delConfig", "value": "TRUE", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "zoneName", "value": "6.5.e164.arpa", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "order", "value": "10", "valueType": "string" } ], "HomeWirelessBAFI": [ { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "actionId", "value": "BafiDeactivate", "valueType": "string" } ], "HomeWirelessTFI": [ { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "actionId", "value": "TFIDeactivate", "valueType": "string" } ], "MobilePostpaid": [ { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "actionId", "value": "PostPaidDeactivate", "valueType": "string" } ], "Volte": [ { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "actionId", "value": "VolteDelete", "valueType": "string" } ] }, "REACT": { "HomeDTH": [ { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "country", "value": "chile", "valueType": "string" } ], "HomeIPTV": [], "HomeInternet": [ { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "realm", "value": "isp", "valueType": "string" } ], "HomeVOIP": [], "HomeWirelessBAFI": [ { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "hlrUserRsa", "value": "0", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "hlrUserBs2g", "value": "1", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "hlrUserBs3g", "value": "1", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "epsUserOdb", "value": "NONE", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "epsUserBarRoaming4g", "value": "0", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "hlrUserProv", "value": "0", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "hlrUserKeep", "value": "0", "valueType": "string" } ], "HomeWirelessTFI": [ { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "hlrUserOba", "value": "0", "valueType": "string" } ], "MobilePostpaid": [ { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "hlrUserProv", "value": "0", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "hlrUserOba", "value": "0", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "hlrUserObr", "value": "0", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "hlrUserBarSmsOut", "value": "0", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "hlrUserObopri", "value": "0", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "hlrUserBs2g", "value": "1", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "hlrUserBs3g", "value": "1", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "epsUserOdb", "value": "NONE", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "epsUserBarRoaming4g", "value": "0", "valueType": "string" } ], "Volte": [ { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "supplementaryServicesIcb", "value": "0", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "supplementaryServicesOcb", "value": "0", "valueType": "string" } ] }, "S1278": { "HomeDTH": [ { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "country", "value": "chile", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "actionId", "value": "DTHBlock", "valueType": "string" } ], "HomeIPTV": [ { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "actionId", "value": "SuspendTV", "valueType": "string" } ], "HomeInternet": [ { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "actionId", "value": "SuspendInternet", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "realm", "value": "isp", "valueType": "string" } ], "HomeVOIP": [ { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "actionId", "value": "SuspendOutVOIP", "valueType": "string" } ], "HomeWirelessBAFI": [ { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "actionId", "value": "BafiBlockServices", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "hlrUserProv", "value": "1", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "hlrUserKeep", "value": "1", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "hlrUserBs2g", "value": "0", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "hlrUserBs3g", "value": "0", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "epsUserOdb", "value": "ODB-ALL", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "epsUserBarRoaming4g", "value": "1", "valueType": "string" } ], "HomeWirelessTFI": [ { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "actionId", "value": "TFIBlockServices", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "hlrUserBarVoiceOut", "value": "1", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "hlrUserBarSmsOut", "value": "1", "valueType": "string" } ], "MobilePostpaid": [ { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "actionId", "value": "PostPaidBlockServices", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "hlrUserProv", "value": "1", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "hlrUserObr", "value": "1", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "hlrUserBarVoiceOut", "value": "1", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "hlrUserBarSmsOut", "value": "1", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "hlrUserBs2g", "value": "0", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "hlrUserBs3g", "value": "0", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "epsUserOdb", "value": "ODB-ALL", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "epsUserBarRoaming4g", "value": "1", "valueType": "string" } ], "Volte": [ { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "subscriptionType", "value": "postpaid", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "actionId", "value": "VolteSuppServ", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "supplementaryServicesIcb", "value": "0", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "supplementaryServicesOcb", "value": "1", "valueType": "string" } ] }, "S2": { "HomeDTH": [ { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "country", "value": "chile", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "actionId", "value": "DTHBlock", "valueType": "string" } ], "HomeIPTV": [ { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "actionId", "value": "SuspendTV", "valueType": "string" } ], "HomeInternet": [ { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "actionId", "value": "SuspendInternet", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "realm", "value": "isp", "valueType": "string" } ], "HomeVOIP": [ { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "actionId", "value": "SuspendOutVOIP", "valueType": "string" } ], "HomeWirelessBAFI": [ { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "actionId", "value": "BafiBlockServices", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "hlrUserProv", "value": "1", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "hlrUserKeep", "value": "1", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "hlrUserBs2g", "value": "0", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "hlrUserBs3g", "value": "0", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "epsUserOdb", "value": "ODB-ALL", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "epsUserBarRoaming4g", "value": "1", "valueType": "string" } ], "HomeWirelessTFI": [ { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "actionId", "value": "TFIBlockServices", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "hlrUserBarVoiceOut", "value": "1", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "hlrUserBarSmsOut", "value": "1", "valueType": "string" } ], "MobilePostpaid": [ { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "actionId", "value": "PostPaidBlockServices", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "hlrUserProv", "value": "0", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "hlrUserObr", "value": "1", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "hlrUserBarVoiceOut", "value": "1", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "hlrUserBarSmsOut", "value": "1", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "hlrUserBs2g", "value": "0", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "hlrUserBs3g", "value": "0", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "epsUserOdb", "value": "NONE", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "epsUserBarRoaming4g", "value": "1", "valueType": "string" } ], "Volte": [ { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "subscriptionType", "value": "postpaid", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "actionId", "value": "VolteSuppServ", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "supplementaryServicesIcb", "value": "0", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "supplementaryServicesOcb", "value": "1", "valueType": "string" } ] }, "S4": { "HomeDTH": [ { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "country", "value": "chile", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "actionId", "value": "DTHBlock", "valueType": "string" } ], "HomeIPTV": [ { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "actionId", "value": "SuspendTV", "valueType": "string" } ], "HomeInternet": [ { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "actionId", "value": "SuspendInternet", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "realm", "value": "isp", "valueType": "string" } ], "HomeVOIP": [ { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "actionId", "value": "SuspendOutVOIP", "valueType": "string" } ], "HomeWirelessBAFI": [ { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "actionId", "value": "BafiBlockServices", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "hlrUserProv", "value": "1", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "hlrUserKeep", "value": "1", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "hlrUserBs2g", "value": "0", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "hlrUserBs3g", "value": "0", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "epsUserOdb", "value": "ODB-ALL", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "epsUserBarRoaming4g", "value": "1", "valueType": "string" } ], "HomeWirelessTFI": [ { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "actionId", "value": "TFIBlockServices", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "hlrUserOba", "value": "1", "valueType": "string" } ], "MobilePostpaid": [ { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "actionId", "value": "PostPaidBlockServices", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "hlrUserProv", "value": "1", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "hlrUserObr", "value": "1", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "hlrUserBarSmsOut", "value": "1", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "hlrUserBs2g", "value": "0", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "hlrUserBs3g", "value": "0", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "epsUserOdb", "value": "ODB-ALL", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "epsUserBarRoaming4g", "value": "1", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "hlrUserObopri", "value": "1", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "hlrUserOba", "value": "1", "valueType": "string" } ], "Volte": [ { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "actionId", "value": "VolteSuppServ", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "subscriptionType", "value": "postpaid", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "supplementaryServicesIcb", "value": "0", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "supplementaryServicesOcb", "value": "1", "valueType": "string" } ] }, "SNOPA": { "HomeDTH": [ { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "country", "value": "chile", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "actionId", "value": "DTHBlock", "valueType": "string" } ], "HomeIPTV": [ { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "actionId", "value": "SuspendTV", "valueType": "string" } ], "HomeInternet": [ { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "actionId", "value": "SuspendInternet", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "realm", "value": "isp", "valueType": "string" } ], "HomeVOIP": [ { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "actionId", "value": "SuspendOutVOIP", "valueType": "string" } ], "HomeWirelessBAFI": [ { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "actionId", "value": "BafiBlockServices", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "hlrUserProv", "value": "1", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "hlrUserKeep", "value": "1", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "hlrUserBs2g", "value": "0", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "hlrUserBs3g", "value": "0", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "epsUserOdb", "value": "ODB-ALL", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "epsUserBarRoaming4g", "value": "1", "valueType": "string" } ], "HomeWirelessTFI": [ { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "actionId", "value": "TFIBlockServices", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "hlrUserOba", "value": "1", "valueType": "string" } ], "MobilePostpaid": [ { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "actionId", "value": "PostPaidBlockServices", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "hlrUserProv", "value": "1", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "hlrUserObr", "value": "1", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "hlrUserBarSmsOut", "value": "1", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "hlrUserBs2g", "value": "0", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "hlrUserBs3g", "value": "0", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "epsUserOdb", "value": "ODB-ALL", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "epsUserBarRoaming4g", "value": "1", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "hlrUserObopri", "value": "1", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "hlrUserOba", "value": "1", "valueType": "string" } ], "Volte": [ { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "actionId", "value": "VolteSuppServ", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "subscriptionType", "value": "postpaid", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "supplementaryServicesIcb", "value": "0", "valueType": "string" }, { "@baseType": "string", "@schemaLocation": "string", "@type": "string", "name": "supplementaryServicesOcb", "value": "1", "valueType": "string" } ] } }'
+        SERVICES_EOC_GETCHARGINGVALUE_JSON: '[{"subFamily": "Hybrid","offerSubType": "Voice","multiSmart": null,"chargingValue": "180"},{"subFamily": "Hybrid","offerSubType": "Data","multiSmart": null,"chargingValue": "67"}]'
+        RESTTEMPLATE_FACTORY_READTIMEOUT: 15000
+        RESTTEMPLATE_FACTORY_CONNECTTIMEOUT: 200
+        APP_HAZELCAST_CONFIG_INSTANCENAME: CollectionsHazelcast
+        APP_HAZELCAST_CONFIG_PORT: 5701
+        APP_HAZELCAST_CONFIG_KUBERNETES_ENABLED: true
+        APP_HAZELCAST_CONFIG_KUBERNETES_NAMESPACE: collections30
+        APP_HAZELCAST_CONFIG_KUBERNETES_SERVICENAME: svc-ordercareadaptor
+        MANAGEMENT_METRICS_EXPORT_PROMETHEUS_ENABLED: true
+    service:
+      type: ClusterIP
+      port: 9096
+    probe:
+      readiness:
+        initialDelaySeconds: 20
+        periodSeconds: 10
+        failureThreshold: 25
+      liveness:
+        initialDelaySeconds: 20
+        periodSeconds: 10
+        failureThreshold: 25
+  msapimadaptor:
+    name: msapimadaptor
+    image: iad.ocir.io/tdecloud/tdecloud_repository/collections30/msapimadaptor
+    version: 0.4.4
+    pullPolicy: Always
+    replicaCount: 4
+    containerPort: 8182
+    configmap:
+      env:
+        _JAVA_OPTIONS: ' -Xmx256m -Xms256m'
+        LOGGING_LEVEL_ROOT: INFO
+        LOGGING_LEVEL_IO_GITHUB_JHIPSTER: INFO
+        LOGGING_LEVEL_COM_READINESSIT_ADAPTORS: INFO
+        SPRING_PROFILES_ACTIVE: prod
+        SPRING_SLEUTH_PROPAGATION_KEYS: 'x-request-id,x-ot-span-context'
+        SERVICES_APIM_ENDPOINT: https://apiinternal.entel.cl/auth/oauth/v2/token
+        SERVICES_APIM_ENABLED: true
+        SERVICES_APIM_APPLICATIONCODE: MIC-SER
+        SERVICES_APIM_OPERATIONURLS_AASS001102: https://apiinternal.entel.cl/communicationManagement/v1/communication
+        SERVICES_APIM_OPERATIONURLS_AASS100906: https://apiinternal.entel.cl/customer/v2/customerInfo
+        SERVICES_APIM_OPERATIONURLS_AASS001125: https://apiinternal.entel.cl/customer/v2/customerInfo
+        SERVICES_APIM_OPERATIONURLS_AASS101234: https://apiinternal.entel.cl/resource/logicalResource/v2/partyLogicalResources/customer/spec
+        SERVICES_APIM_OPERATIONURLS_AASS100603: https://apiinternal.entel.cl/resource/v1/physicalResources/changeAvailability
+        RESTTEMPLATE_FACTORY_CONNECTTIMEOUT: 10000
+        RESTTEMPLATE_FACTORY_READTIMEOUT: 20000
+        MANAGEMENT_METRICS_EXPORT_PROMETHEUS_ENABLED: true
+    service:
+      type: ClusterIP
+      port: 8182
+    probe:
+      readiness:
+        initialDelaySeconds: 20
+        periodSeconds: 10
+        failureThreshold: 25
+      liveness:
+        initialDelaySeconds: 20
+        periodSeconds: 10
+        failureThreshold: 25
+  msebusadaptor:
+    name: msebusadaptor
+    image: iad.ocir.io/tdecloud/tdecloud_repository/collections30/msebusadaptor
+    version: 0.4.0
+    pullPolicy: Always
+    replicaCount: 6
+    containerPort: 8184
+    configmap:
+      env:
+        _JAVA_OPTIONS: ' -Xmx256m -Xms256m'
+        LOGGING_LEVEL_ROOT: INFO
+        LOGGING_LEVEL_COM_READINESSIT_ADAPTORS: INFO
+        SPRING_PROFILES_ACTIVE: prod
+        SPRING_DATASOURCE_URL: jdbc:oracle:thin:@10.52.130.35:1521/MSPRD
+        SPRING_DATASOURCE_USERNAME: COLLECTIONS_PROCESSEXEC
+        SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.Oracle12cDialect
+        SPRING_JPA_DATABASE: ORACLE
+        SPRING_SLEUTH_PROPAGATION_KEYS: 'x-request-id,x-ot-span-context'
+        APP_ENDPOINTS_ROUTES_EBUS_EAI_PUBLISHINVENTORYENTITYPROJECT_URL: 'http://10.51.12.28:7010/ES/PublishInventoryEntityProject/v1'
+        APP_ENDPOINTS_ROUTES_EBUS_EAI_GETINVENTORYENTITYPROJECT_URL: 'http://10.51.12.28:7010/ES/GetInventoryEntityProject/v1'
+        APP_ENDPOINTS_ROUTES_EBUS_EAI_CREATEINVENTORYENTITYPROJECT_URL: 'http://10.51.12.28:7010/ES/CreateInventoryEntityProject/v1'
+        APP_ENDPOINTS_ROUTES_EBUS_SAP_UPDATECUSTOMERACCOUNTRECEIVABLE_URL: 'http://10.51.12.28:7010/ES/UpdateCustomerAccountReceivable/v1'
+        APP_ENDPOINTS_ROUTES_EBUS_WEDO_VALIDATERESOURCEBLACKLIST_URL: 'http://10.51.12.28:7010/ES/ValidateResourceBlackList/v1'
+        APP_ENDPOINTS_ROUTES_CALLBACK_EAI_CREATEINVENTORYENTITYPROJECT_WORKFLOW_URL: 'http://svc-workflowengine.collections30.svc.cluster.local/services/workflowengine/v1/execution/workflow/eaiCallbackCreateInventory/run'
+        APP_ENDPOINTS_ROUTES_CALLBACK_EAI_CREATEINVENTORYENTITYPROJECT_WORKFLOW_BODY: '{"transactionId":"${responseHeader.trace.eventID}","correlationEventId":"${responseHeader.trace.correlationEventID}","status":"${responseHeader.result.status}","projectId":"${body.feasibility.service.projectID}","clientCorrelationId":"${body.feasibility.service.clientCorrelationID}"}'
+        APP_ENDPOINTS_ROUTES_CALLBACK_EAI_PUBLISHINVENTORYENTITYPROJECT_WORKFLOW_URL: 'http://svc-workflowengine.collections30.svc.cluster.local/services/workflowengine/v1/execution/workflow/eaiCallbackPublishInventory/run'
+        APP_ENDPOINTS_ROUTES_CALLBACK_EAI_PUBLISHINVENTORYENTITYPROJECT_WORKFLOW_BODY: '{"transactionId":"${responseHeader.trace.eventID}","correlationEventId":"${responseHeader.trace.correlationEventID}","status":"${responseHeader.result.status}","projectId":"${body.feasibility.service.projectID}","clientCorrelationId":"${body.feasibility.service.clientCorrelationID}"}'
+        HTTP_FACTORY_READTIMEOUT: 20000
+        MANAGEMENT_METRICS_EXPORT_PROMETHEUS_ENABLED: true
+    service:
+      type: ClusterIP
+      port: 8184
+    probe:
+      readiness:
+        initialDelaySeconds: 20
+        periodSeconds: 10
+        failureThreshold: 25
+      liveness:
+        initialDelaySeconds: 20
+        periodSeconds: 10
+        failureThreshold: 25
+  msecmadaptor:
+    name: msecmadaptor
+    image: iad.ocir.io/tdecloud/tdecloud_repository/collections30/msecmadaptor
+    version: 0.4.1
+    pullPolicy: Always
+    replicaCount: 2
+    containerPort: 8183
+    configmap:
+      env:
+        _JAVA_OPTIONS: ' -Xmx1024m -Xms1024m'
+        LOGGING_LEVEL_ROOT: INFO
+        LOGGING_LEVEL_IO_GITHUB_JHIPSTER: INFO
+        LOGGING_LEVEL_COM_READINESSIT_ADAPTORS: INFO
+        SPRING_PROFILES_ACTIVE: prod
+        SPRING_DATASOURCE_URL: jdbc:oracle:thin:@10.52.130.35:1521/MSPRD
+        SPRING_DATASOURCE_USERNAME: COLLECTIONS_PROCESSCONFIG
+        SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.Oracle12cDialect
+        SPRING_JPA_DATABASE: ORACLE
+        SPRING_SLEUTH_PROPAGATION_KEYS: 'x-request-id,x-ot-span-context'
+        APP_HAZELCAST_CONFIG_INSTANCENAME: msecmadaptor
+        APP_HAZELCAST_CONFIG_PORT: 5701
+        APP_HAZELCAST_CONFIG_KUBERNETES_ENABLED: true
+        APP_HAZELCAST_CONFIG_KUBERNETES_NAMESPACE: collections30
+        APP_HAZELCAST_CONFIG_KUBERNETES_SERVICENAME: svc-msecmadaptor
+        REST_TEMPLATE_FACTORY_CONNECTTIMEOUT: 3000
+        REST_TEMPLATE_FACTORY_READTIMEOUT: 100000
+        SCHEDULES_ECMRECOVERY_REMOVECANCELLED: false
+        SCHEDULES_ECMRECOVERY_REMOVENONORDERABLE: false
+        SCHEDULES_ECMRECOVERY_INFOTABLEURL: http://vipecmuiint7004.tdeprdcl.internal:7004/ecm/services/InfoTableMaintenance?wsdl
+        SCHEDULES_ECMRECOVERY_GETTOKENURL: http://vipecmuiint7004.tdeprdcl.internal:7004/ecm/avmSecurity/getToken
+        SCHEDULES_ECMRECOVERY_ECMPRODUCTOFFERINGURL: http://vipecmuiint7004.tdeprdcl.internal:7004/ecm/ecmRT/v2/productOffering/{poId}
+        SCHEDULES_ECMRECOVERY_BASICAUTH_USER: JARAYAT
+        SPRING_LIQUIBASE_PARAMETERS_TABLESPACE_HISTORIC: PROCESSCONFIG_DATA
+        SPRING_LIQUIBASE_PARAMETERS_TABLESPACE_RUNTIME: PROCESSCONFIG_DATA
+        SPRING_LIQUIBASE_PARAMETERS_TABLESPACE_CONFIG: PROCESSCONFIG_DATA
+        SPRING_LIQUIBASE_PARAMETERS_PARTITION_INITIALDATE: '2020-11-06 00:00:00'
+        SPRING_LIQUIBASE_PARAMETERS_TABLESPACE_IDX_HISTORIC: PROCESSCONFIG_INX
+        SPRING_LIQUIBASE_PARAMETERS_TABLESPACE_IDX_RUNTIME: PROCESSCONFIG_INX
+        SPRING_LIQUIBASE_PARAMETERS_TABLESPACE_IDX_CONFIG: PROCESSCONFIG_INX
+        MANAGEMENT_METRICS_EXPORT_PROMETHEUS_ENABLED: true
+        COMMONS_SCHEDULER_SCHEDULER_SERVER_REPORT_URL: http://svc-schedulermanager.collections30.svc.cluster.local/services/schedulermanager/api/schedule/reporting
+    service:
+      type: ClusterIP
+      port: 8183
+    probe:
+      readiness:
+        initialDelaySeconds: 40
+        periodSeconds: 10
+        failureThreshold: 25
+      liveness:
+        initialDelaySeconds: 40
+        periodSeconds: 10
+        failureThreshold: 25
+  mserpadaptor:
+    name: mserpadaptor
+    image: iad.ocir.io/tdecloud/tdecloud_repository/collections30/mserpadaptor
+    version: 0.1.9
+    pullPolicy: Always
+    replicaCount: 4
+    containerPort: 8181
+    configmap:
+      env:
+        SPRING_PROFILES_ACTIVE: prod
+        SPRING_SLEUTH_PROPAGATION_KEYS: 'x-request-id,x-ot-span-context'
+        _JAVA_OPTIONS: ' -Xmx256m -Xms256m'
+        LOGGING_LEVEL_ROOT: INFO
+        LOGGING_LEVEL_IO_GITHUB_JHIPSTER: INFO
+        LOGGING_LEVEL_COM_READINESSIT_ADAPTORS: INFO
+        SERVICES_ERP_ENDPOINT: 'http://192.168.173.195:8000/sap/bc/srt/rfc/sap/zsv_i118_repaso_suspension/040/zsv_i118_repaso_suspension/zsv_i118_repaso_suspension'
+        MANAGEMENT_METRICS_EXPORT_PROMETHEUS_ENABLED: true
+    service:
+      type: ClusterIP
+      port: 8181
+    probe:
+      readiness:
+        initialDelaySeconds: 20
+        periodSeconds: 10
+        failureThreshold: 25
+      liveness:
+        initialDelaySeconds: 20
+        periodSeconds: 10
+        failureThreshold: 25
+  mstmfnaascomponentsuite:
+    name: mstmfnaascomponentsuite
+    image: iad.ocir.io/tdecloud/tdecloud_repository/collections30/mstmfnaascomponentsuite
+    version: 0.4.4
+    pullPolicy: Always
+    replicaCount: 18
+    containerPort: 8100
+    configmap:
+      env:
+        SPRING_PROFILES_ACTIVE: prod
+        SPRING_SLEUTH_PROPAGATION_KEYS: 'x-request-id,x-ot-span-context'
+        _JAVA_OPTIONS: ' -Xmx256m -Xms256m'
+        LOGGING_LEVEL_ROOT: INFO
+        LOGGING_LEVEL_IO_GITHUB_JHIPSTER: INFO
+        LOGGING_LEVEL_COM_READINESSIT_ADAPTORS: INFO
+        APP_ENDPOINTS_ROUTES_EMA_URL: 'http://10.51.17.75:8080/CAI3G1.2/services/CAI3G1.2'
+        APP_INTERFACES_EMA_USERNAME: CollectionProv
+        APP_INTERFACES_EMA_SESSIONIDFAULTCODE: 1001
+        APP_INTERFACES_EMA_XPATH_SESSIONID: /S:Envelope/S:Body/cai3g:LoginResponse//cai3g:sessionId
+        APP_INTERFACES_EMA_XPATH_FAULT: /S:Envelope/S:Body/ns2:Fault
+        APP_INTERFACES_EMA_XPATH_FAULTCODE: /S:Envelope/S:Body/ns2:Fault/detail/Cai3gFault:Cai3gFault/Cai3gFault:faultcode
+        APP_HAZELCAST_CONFIG_INSTANCENAME: CollectionsHazelcast
+        APP_HAZELCAST_CONFIG_PORT: 5701
+        APP_HAZELCAST_CONFIG_KUBERNETES_ENABLED: true
+        APP_HAZELCAST_CONFIG_KUBERNETES_NAMESPACE: collections30
+        APP_HAZELCAST_CONFIG_KUBERNETES_SERVICENAME: svc-mstmfnaascomponentsuite
+        RESTTEMPLATE_FACTORY_CONNECTTIMEOUT: 3000
+        RESTTEMPLATE_FACTORY_READTIMEOUT: 20000
+        MANAGEMENT_METRICS_EXPORT_PROMETHEUS_ENABLED: true
+    service:
+      type: ClusterIP
+      port: 8100
+    probe:
+      readiness:
+        initialDelaySeconds: 20
+        periodSeconds: 10
+        failureThreshold: 25
+      liveness:
+        initialDelaySeconds: 20
+        periodSeconds: 10
+        failureThreshold: 25
+  mstmfprepaybalancemanagement:
+    name: mstmfprepaybalancemanagement
+    image: iad.ocir.io/tdecloud/tdecloud_repository/collections30/mstmfprepaybalancemanagement
+    version: 0.2.6
+    pullPolicy: Always
+    replicaCount: 4
+    containerPort: 8099
+    configmap:
+      env:
+        SPRING_PROFILES_ACTIVE: prod
+        SPRING_SLEUTH_PROPAGATION_KEYS: 'x-request-id,x-ot-span-context'
+        _JAVA_OPTIONS: ' -Xmx512m -Xms512m'
+        LOGGING_LEVEL_ROOT: INFO
+        LOGGING_LEVEL_IO_GITHUB_JHIPSTER: INFO
+        LOGGING_LEVEL_COM_READINESSIT_ADAPTORS: INFO
+        APP_ENDPOINTS_ROUTES_CS_URL: 'http://10.51.25.151:10011/Air'
+        APP_HAZELCAST_CONFIG_INSTANCENAME: CollectionsHazelcast
+        APP_HAZELCAST_CONFIG_PORT: 5701
+        APP_HAZELCAST_CONFIG_KUBERNETES_ENABLED: true
+        APP_HAZELCAST_CONFIG_KUBERNETES_NAMESPACE: collections30
+        APP_HAZELCAST_CONFIG_KUBERNETES_SERVICENAME: svc-mstmfprepaybalancemanagement
+        MANAGEMENT_METRICS_EXPORT_PROMETHEUS_ENABLED: true
+    service:
+      type: ClusterIP
+      port: 8099
+    probe:
+      readiness:
+        initialDelaySeconds: 20
+        periodSeconds: 10
+        failureThreshold: 25
+      liveness:
+        initialDelaySeconds: 20
+        periodSeconds: 10
+        failureThreshold: 25
+  bscs:
+    name: bscs
+    image: iad.ocir.io/tdecloud/tdecloud_repository/collections30/acl-collections-bscs
+    version: 1.0.6
+    pullPolicy: Always
+    replicaCount: 3
+    replicaCountMax: 3
+    containerPort: 8080
+    containerHZCPort: 5701
+    mountPath: /etc/localtime
+    volumeName: tz-config
+    volumePath: /usr/share/zoneinfo/
+    timeZoneValue: America/Santiago
+    probe:
+      readiness:
+        path: /management/health
+        initialDelaySeconds: 5
+        periodSeconds: 30
+        failureThreshold: 30
+      liveness:
+        path: /management/health
+        initialDelaySeconds: 5
+        periodSeconds: 30
+        failureThreshold: 30
+    configmap:
+      env:
+        VAR_VALUES_PARAMS: BU_ID=2
+        URL_BSCS: http://vipssopub80.tdeprdcl.internal:36762/wsi/services/
+        ECOSYTEM_NAME: Collections30-CL
+        DNS_LOGSTASH: 172.30.17.87:5000
+        IGNORE_PATTERNS: /(management|swagger|webjars|healthcheck|api/collections).*|nio-8080|
+        TZ: America/Santiago
+        hazelcast_instance_name: bscsconfig
+        hazelcast_multicast_enabled: false
+        hazelcast_kubernetes_enabled: true
+        hazelcast_kubernetes_namespace: collections30
+        hazelcast_kubernetes_service-name: svc-hzcbscs
+        hazelcast_kubernetes_service-dns: svc-hzcbscs
+        hazelcast_kubernetes_instance-port: 5701
+    services:
+      bscs:
+         name: bscs-service
+         protocol: http
+         type: ClusterIP
+         port: 80
+         targetPort: 8080
+         monitor: /management/prometheus
+         monitorInterval: 40s
+      hazelcast:
+         name: svc-hzcbscs
+         protocol: http
+         port: 5701
+         type: ClusterIP
+         targetPort: 5701
+         monitor: /management/prometheus
+         monitorInterval: 40s
+ociSecret:
+  name: ocir

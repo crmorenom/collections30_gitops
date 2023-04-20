@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cm-{{ .Values.microservices.workflowengine.name }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    app.kubernetes.io/instance: {{ .Values.microservices.workflowengine.name }}
+    project: {{ .Values.project }}
+data:
+{{- range $key, $value := .Values.microservices.workflowengine.configmap.env }}
+  {{ $key }}: {{ $value | quote }}
+{{- end }}

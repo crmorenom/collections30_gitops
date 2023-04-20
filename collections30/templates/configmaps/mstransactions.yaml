@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cm-{{ .Values.microservices.msentitytransactions.name }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    app.kubernetes.io/instance: {{ .Values.microservices.msentitytransactions.name }}
+    project: {{ .Values.project }}
+data:
+{{- range $key, $value := .Values.microservices.msentitytransactions.configmap.env }}
+  {{ $key }}: {{ $value | quote }}
+{{- end }}

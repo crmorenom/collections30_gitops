@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-{{ .Values.microservices.msapimadaptor.name }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    app.kubernetes.io/instance: {{ .Values.microservices.msapimadaptor.name }}
+    project: {{ .Values.project }}
+    app.kubernetes.io/name: {{ .Values.microservices.msapimadaptor.name }}
+spec:
+  type: {{ .Values.microservices.msapimadaptor.service.type }}
+  ports:
+    - port: 80
+      name: http
+      targetPort: {{ .Values.microservices.msapimadaptor.service.port }}
+  selector:
+    app.kubernetes.io/instance: {{ .Values.microservices.msapimadaptor.name }}

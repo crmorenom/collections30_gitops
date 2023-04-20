@@ -1,0 +1,23 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: metrics-{{ .Values.microservices.mstmfprepaybalancemanagement.name }}
+  namespace: cattle-prometheus
+  labels:
+    app: {{ .Values.microservices.mstmfprepaybalancemanagement.name }}
+    heritage: Tiller
+    io.cattle.field/appId: cluster-monitoring
+    release: cluster-monitoring
+    source: {{ .Values.microservices.mstmfprepaybalancemanagement.name }}
+spec:
+  endpoints:
+  - interval: 30s
+    port: http
+    path: /services/mstmfprepaybalancemanagement/management/prometheus
+  namespaceSelector:
+    matchNames:
+    - {{ .Values.namespace }}
+  selector:
+    matchLabels:
+       app.kubernetes.io/name: {{ .Values.microservices.mstmfprepaybalancemanagement.name }}
+       

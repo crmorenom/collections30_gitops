@@ -1,0 +1,70 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.microservices.msecmadaptor.name }}
+  namespace: {{ .Values.namespace }}
+  annotations:
+    reloader.stakater.com/auto: "true"
+spec:
+  selector:
+    matchLabels:
+      run: {{ .Values.microservices.msecmadaptor.name }}
+  replicas: {{ .Values.microservices.msecmadaptor.replicaCount }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/instance: {{ .Values.microservices.msecmadaptor.name }}
+        project: {{ .Values.project }}
+        run: {{ .Values.microservices.msecmadaptor.name }}
+    spec:
+      containers:
+        - name: {{ .Values.microservices.msecmadaptor.name }}
+          image: {{ .Values.microservices.msecmadaptor.image }}:{{ .Values.microservices.msecmadaptor.version }}
+          imagePullPolicy: {{ .Values.microservices.msecmadaptor.pullPolicy }}
+          env:
+            - name: JHIPSTER_SECURITY_AUTHENTICATION_JWT_BASE64_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: jwt-secret-{{ .Values.microservices.msecmadaptor.name }}
+                  key: secret
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: jwt-secret-{{ .Values.microservices.msecmadaptor.name }}
+                  key: databasePassword
+            - name: SCHEDULES_ECMRECOVERY_BASICAUTH_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: jwt-secret-{{ .Values.microservices.msecmadaptor.name }}
+                  key: basicauthPassword
+          envFrom:
+            - configMapRef:
+                name: cm-{{ .Values.microservices.msecmadaptor.name }}
+          ports:
+            - containerPort: {{ .Values.microservices.msecmadaptor.containerPort }}
+              protocol: TCP
+            - containerPort: {{ .Values.microservices.msecmadaptor.configmap.env.APP_HAZELCAST_CONFIG_PORT }}
+              protocol: TCP
+          volumeMounts:
+            - name: tz-config
+              mountPath: /etc/localtime
+          readinessProbe:
+            httpGet:
+              path: /services/{{ .Values.microservices.msecmadaptor.name }}/management/health
+              port: {{ .Values.microservices.msecmadaptor.containerPort }}
+            initialDelaySeconds: {{ .Values.microservices.msecmadaptor.probe.readiness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.microservices.msecmadaptor.probe.readiness.periodSeconds }}
+            failureThreshold: {{ .Values.microservices.msecmadaptor.probe.readiness.failureThreshold }}
+          livenessProbe:
+            httpGet:
+              path: /services/{{ .Values.microservices.msecmadaptor.name }}/management/health
+              port: {{ .Values.microservices.msecmadaptor.containerPort }}
+            initialDelaySeconds: {{ .Values.microservices.msecmadaptor.probe.liveness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.microservices.msecmadaptor.probe.liveness.periodSeconds }}
+            failureThreshold: {{ .Values.microservices.msecmadaptor.probe.liveness.failureThreshold }}
+      volumes:
+        - name: tz-config
+          hostPath:
+            path: /usr/share/zoneinfo/America/Santiago
+      imagePullSecrets:
+        - name: {{ .Values.ociSecret.name }}

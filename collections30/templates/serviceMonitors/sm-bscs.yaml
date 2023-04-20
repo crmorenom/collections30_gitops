@@ -1,0 +1,22 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: metrics-{{ .Values.microservices.bscs.name }}
+  namespace: cattle-prometheus
+  labels:
+    app: {{ .Values.microservices.bscs.name }}
+    heritage: Tiller
+    io.cattle.field/appId: cluster-monitoring
+    release: prometheus-operator
+    source: {{ .Values.microservices.bscs.services.bscs.name }}
+spec:
+  endpoints:
+  - interval: {{ .Values.microservices.bscs.services.bscs.monitorInterval }}
+    port: {{ .Values.microservices.bscs.services.bscs.protocol }}
+    path: {{ .Values.microservices.bscs.services.bscs.monitor }}
+  namespaceSelector:
+    matchNames:
+    - {{ .Values.namespace }}
+  selector:
+    matchLabels:
+       app: {{ .Values.microservices.bscs.services.bscs.name }}

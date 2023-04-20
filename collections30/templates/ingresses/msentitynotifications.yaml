@@ -1,0 +1,17 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: in-{{ .Values.microservices.msentitynotifications.name }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    app.kubernetes.io/instance: in-{{ .Values.microservices.msentitynotifications.name }}
+    project: {{ .Values.project }}
+spec:
+  rules:
+  - host: {{ .Values.microservices.msentitynotifications.ingress.domainName }}
+    http:
+      paths:
+      - backend:
+          serviceName: svc-{{ .Values.microservices.msentitynotifications.name }}
+          servicePort: {{ .Values.microservices.msentitynotifications.service.port }}
+        path: /services/msentitynotifications

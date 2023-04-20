@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-{{ .Values.microservices.mschannelsadaptorws.name }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    app.kubernetes.io/instance: {{ .Values.microservices.mschannelsadaptorws.name }}
+    project: {{ .Values.project }}
+    app.kubernetes.io/name: {{ .Values.microservices.mschannelsadaptorws.name }}
+spec:
+  type: {{ .Values.microservices.mschannelsadaptorws.service.type }}
+  ports:
+    - port: 80
+      name: http
+      targetPort: {{ .Values.microservices.mschannelsadaptorws.service.port }}
+  selector:
+    app.kubernetes.io/instance: {{ .Values.microservices.mschannelsadaptorws.name }}

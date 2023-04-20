@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.microservices.mstmfcommunication.name }}
+  namespace: {{ .Values.namespace }}
+  annotations:
+    reloader.stakater.com/auto: "true"
+spec:
+  selector:
+    matchLabels:
+      run: {{ .Values.microservices.mstmfcommunication.name }}
+  replicas: {{ .Values.microservices.mstmfcommunication.replicaCount }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/instance: {{ .Values.microservices.mstmfcommunication.name }}
+        project: {{ .Values.project }}
+        run: {{ .Values.microservices.mstmfcommunication.name }}
+    spec:
+      containers:
+        - name: {{ .Values.microservices.mstmfcommunication.name }}
+          image: {{ .Values.microservices.mstmfcommunication.image }}:{{ .Values.microservices.mstmfcommunication.version }}
+          imagePullPolicy: {{ .Values.microservices.mstmfcommunication.pullPolicy }}
+          env:
+            - name: JHIPSTER_SECURITY_AUTHENTICATION_JWT_BASE64_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: jwt-secret-{{ .Values.microservices.mstmfcommunication.name }}
+                  key: secret
+          envFrom:
+            - configMapRef:
+                name: cm-{{ .Values.microservices.mstmfcommunication.name }}
+          ports:
+            - containerPort: {{ .Values.microservices.mstmfcommunication.containerPort }}
+              protocol: TCP
+          volumeMounts:
+            - name: tz-config
+              mountPath: /etc/localtime
+          readinessProbe:
+            httpGet:
+              path: /services/{{ .Values.microservices.mstmfcommunication.name }}/management/health
+              port: {{ .Values.microservices.mstmfcommunication.containerPort }}
+            initialDelaySeconds: {{ .Values.microservices.mstmfcommunication.probe.readiness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.microservices.mstmfcommunication.probe.readiness.periodSeconds }}
+            failureThreshold: {{ .Values.microservices.mstmfcommunication.probe.readiness.failureThreshold }}
+          livenessProbe:
+            httpGet:
+              path: /services/{{ .Values.microservices.mstmfcommunication.name }}/management/health
+              port: {{ .Values.microservices.mstmfcommunication.containerPort }}
+            initialDelaySeconds: {{ .Values.microservices.mstmfcommunication.probe.liveness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.microservices.mstmfcommunication.probe.liveness.periodSeconds }}
+            failureThreshold: {{ .Values.microservices.mstmfcommunication.probe.liveness.failureThreshold }}
+      volumes:
+        - name: tz-config
+          hostPath:
+            path: /usr/share/zoneinfo/America/Santiago
+      imagePullSecrets:
+        - name: {{ .Values.ociSecret.name }}

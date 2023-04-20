@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.microservices.mstmfnaascomponentsuite.name }}
+  namespace: {{ .Values.namespace }}
+  annotations:
+    reloader.stakater.com/auto: "true"
+spec:
+  selector:
+    matchLabels:
+      run: {{ .Values.microservices.mstmfnaascomponentsuite.name }}
+  replicas: {{ .Values.microservices.mstmfnaascomponentsuite.replicaCount }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/instance: {{ .Values.microservices.mstmfnaascomponentsuite.name }}
+        project: {{ .Values.project }}
+        run: {{ .Values.microservices.mstmfnaascomponentsuite.name }}
+    spec:
+      containers:
+        - name: {{ .Values.microservices.mstmfnaascomponentsuite.name }}
+          image: {{ .Values.microservices.mstmfnaascomponentsuite.image }}:{{ .Values.microservices.mstmfnaascomponentsuite.version }}
+          imagePullPolicy: {{ .Values.microservices.mstmfnaascomponentsuite.pullPolicy }}
+          env:
+            - name: JHIPSTER_SECURITY_AUTHENTICATION_JWT_BASE64_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: jwt-secret-{{ .Values.microservices.mstmfnaascomponentsuite.name }}
+                  key: secret
+            - name: APP_INTERFACES_EMA_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: jwt-secret-{{ .Values.microservices.mstmfnaascomponentsuite.name }}
+                  key: emaPassword
+          envFrom:
+            - configMapRef:
+                name: cm-{{ .Values.microservices.mstmfnaascomponentsuite.name }}
+          ports:
+            - containerPort: {{ .Values.microservices.mstmfnaascomponentsuite.containerPort }}            
+              protocol: TCP
+            - containerPort: {{ .Values.microservices.mstmfnaascomponentsuite.configmap.env.APP_HAZELCAST_CONFIG_PORT }}
+              protocol: TCP
+          volumeMounts:
+            - name: tz-config
+              mountPath: /etc/localtime
+          readinessProbe:
+            httpGet:
+              path: /services/{{ .Values.microservices.mstmfnaascomponentsuite.name }}/management/health
+              port: {{ .Values.microservices.mstmfnaascomponentsuite.containerPort }}
+            initialDelaySeconds: {{ .Values.microservices.mstmfnaascomponentsuite.probe.readiness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.microservices.mstmfnaascomponentsuite.probe.readiness.periodSeconds }}
+            failureThreshold: {{ .Values.microservices.mstmfnaascomponentsuite.probe.readiness.failureThreshold }}
+          livenessProbe:
+            httpGet:
+              path: /services/{{ .Values.microservices.mstmfnaascomponentsuite.name }}/management/health
+              port: {{ .Values.microservices.mstmfnaascomponentsuite.containerPort }}
+            initialDelaySeconds: {{ .Values.microservices.mstmfnaascomponentsuite.probe.liveness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.microservices.mstmfnaascomponentsuite.probe.liveness.periodSeconds }}
+            failureThreshold: {{ .Values.microservices.mstmfnaascomponentsuite.probe.liveness.failureThreshold }}
+      volumes:
+        - name: tz-config
+          hostPath:
+            path: /usr/share/zoneinfo/America/Santiago
+      imagePullSecrets:
+        - name: {{ .Values.ociSecret.name }}

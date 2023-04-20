@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cm-{{ .Values.microservices.mstmfcommunication.name }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    app.kubernetes.io/instance: {{ .Values.microservices.mstmfcommunication.name }}
+    project: {{ .Values.project }}
+data:
+{{- range $key, $value := .Values.microservices.mstmfcommunication.configmap.env }}
+  {{ $key }}: {{ $value | quote }}
+{{- end }}

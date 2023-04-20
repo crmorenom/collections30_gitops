@@ -1,0 +1,17 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: in-{{ .Values.microservices.workflowengine.name }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    app.kubernetes.io/instance: in-{{ .Values.microservices.workflowengine.name }}
+    project: {{ .Values.project }}
+spec:
+  rules:
+  - host: {{ .Values.microservices.workflowengine.ingress.domainName }}
+    http:
+      paths:
+      - backend:
+          serviceName: svc-{{ .Values.microservices.workflowengine.name }}
+          servicePort: {{ .Values.microservices.workflowengine.service.port }}
+        path: /services/workflowengine

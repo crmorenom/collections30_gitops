@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-{{ .Values.microservices.mserpadaptor.name }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    app.kubernetes.io/instance: {{ .Values.microservices.mserpadaptor.name }}
+    project: {{ .Values.project }}
+    app.kubernetes.io/name: {{ .Values.microservices.mserpadaptor.name }}
+spec:
+  type: {{ .Values.microservices.mserpadaptor.service.type }}
+  ports:
+    - port: 80
+      name: http
+      targetPort: {{ .Values.microservices.mserpadaptor.service.port }}
+  selector:
+    app.kubernetes.io/instance: {{ .Values.microservices.mserpadaptor.name }}
